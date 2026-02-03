@@ -8,7 +8,7 @@ import {
 } from "react-hook-form";
 import * as yup from "yup";
 import { ObjectSchema } from "yup";
-import { useAddBill } from "../../hooks/useAddBill";
+// import { useAddBill } from "../../hooks/useAddBill";
 import { generateBillPDF } from "../../utils/pdf";
 import type { IReceiptData } from "../../interface/recipe";
 
@@ -21,7 +21,7 @@ export default function BillFormProvider(
   props: BillFormProviderProps,
 ): ReactElement {
   const { children, formRef } = props;
-  const { mutate, isPending, error } = useAddBill();
+  // const { mutate, isPending, error } = useAddBill();
 
   const defaultValues: IBillForm = useMemo(
     () => ({
@@ -104,6 +104,7 @@ export default function BillFormProvider(
             amount: electricityUsage.toString(),
           },
         ],
+        internet: internet.toString(),
         houseRent: rent.toString(),
         total: (waterUsage + electricityUsage + rent).toString(),
       };

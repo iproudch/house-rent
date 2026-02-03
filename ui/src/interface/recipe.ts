@@ -12,6 +12,7 @@ export interface IReceiptData {
   month: string;
   year: string;
   items: IReceiptItem[];
+  internet: string;
   houseRent: string;
   total: string;
 }

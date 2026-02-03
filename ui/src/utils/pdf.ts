@@ -1,8 +1,8 @@
 import { jsPDF } from "jspdf";
+import type { IReceiptData } from "../interface/recipe";
 import SARABUN_FONT from "../fonts/sarabunFont";
-import { IReceiptData } from "../interface/recipe";
 
-const addThaiFont = (doc) => {
+const addThaiFont = (doc: jsPDF) => {
   doc.addFileToVFS("Sarabun-Regular.ttf", SARABUN_FONT);
   doc.addFont("Sarabun-Regular.ttf", "Sarabun", "normal");
   doc.setFont("Sarabun");

@@ -8,6 +8,16 @@ interface UsePreviousBillProps {
   billingMonth?: string;
 }
 
+const fetchPreviousBill = ({
+  houseId,
+  billingMonth,
+}: {
+  houseId: string;
+  billingMonth: string;
+}): Promise<IBill | null> => {
+  return getPreviousBill({ houseId, billingMonth }) as Promise<IBill | null>;
+};
+
 export const usePreviousBill = ({
   houseId,
   billingMonth,
@@ -15,10 +25,10 @@ export const usePreviousBill = ({
   return useQuery<IBill | null>({
     queryKey: ["previous-bill", houseId, billingMonth],
     queryFn: () =>
-      getPreviousBill({
-        houseId: houseId!,
-        billingMonth: billingMonth!,
+      fetchPreviousBill({
+        houseId: houseId as string,
+        billingMonth: billingMonth as string,
       }),
-    enabled: !!houseId && !!billingMonth,
+    enabled: Boolean(houseId && billingMonth),
   });
 };
