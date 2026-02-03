@@ -1,7 +1,7 @@
 // hooks/usePreviousBill.ts
 import { useQuery } from "@tanstack/react-query";
 import type { IBill } from "../../@types/bill";
-import { getPreviousBill } from "../../../api/src/api/bills";
+import { getPreviousBill } from "../api/bills";
 
 interface UsePreviousBillProps {
   houseId?: string;

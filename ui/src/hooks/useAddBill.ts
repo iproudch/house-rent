@@ -1,6 +1,5 @@
-// hooks/useAddBill.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addBill } from "../../../api/src/api/bills";
+import { addBill } from "../api/bills";
 
 export const useAddBill = () => {
   const queryClient = useQueryClient();
@@ -9,7 +8,6 @@ export const useAddBill = () => {
     mutationFn: addBill,
 
     onSuccess: (data) => {
-      // optional: refetch bills list
       queryClient.invalidateQueries({
         queryKey: ["bills", data.house_id],
       });

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchHouses } from "../../../api/src/api/houses";
+import { fetchHouses } from "../api/houses";
 
 export const useHouses = () => {
   return useQuery({
