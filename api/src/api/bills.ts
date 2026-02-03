@@ -19,11 +19,6 @@ export interface IBill {
   internet?: number;
 }
 
-interface IPreviousBillPayload {
-  houseId: string;
-  billingMonth: string;
-}
-
 export const getPreviousBill = async (params: {
   houseId: string;
   billingMonth: string;
