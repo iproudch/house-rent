@@ -1,6 +1,6 @@
 // hooks/usePreviousBill.ts
 import { useQuery } from "@tanstack/react-query";
-import { IBill } from "../../@types/bill";
+import type { IBill } from "../../@types/bill";
 import { getPreviousBill } from "../../../api/src/api/bills";
 
 interface UsePreviousBillProps {

@@ -10,11 +10,11 @@ import * as yup from "yup";
 import { ObjectSchema } from "yup";
 import { useAddBill } from "../../hooks/useAddBill";
 import { generateBillPDF } from "../../utils/pdf";
-import { IReceiptData } from "../../../@types/recipe";
+import type { IReceiptData } from "../../interface/recipe";
 
 type BillFormProviderProps = {
   children: React.ReactNode | React.ReactNode[];
-  formRef: React.RefObject<HTMLFormElement>;
+  formRef: React.RefObject<HTMLFormElement | null>;
 };
 
 export default function BillFormProvider(
@@ -30,6 +30,8 @@ export default function BillFormProvider(
       prevWaterUsage: 0,
       waterUnit: 0,
       waterUsage: 0,
+      prevElectricityUnit: 0,
+      prevElectricityUsage: 0,
       electricityUnit: 0,
       electricityUsage: 0,
       internet: 0,
@@ -51,7 +53,7 @@ export default function BillFormProvider(
     resolver,
   });
 
-  const { reset, handleSubmit, setValue } = formMethods;
+  const { reset, handleSubmit } = formMethods;
 
   const onReset = useCallback(() => {
     reset(defaultValues);
@@ -63,11 +65,11 @@ export default function BillFormProvider(
       prevWaterUnit,
       waterUnit,
       waterUsage,
-      internet,
-      billingMonth,
       prevElectricityUnit,
       electricityUnit,
       electricityUsage,
+      internet,
+      billingMonth,
       rent,
     } = data;
     try {
@@ -139,6 +141,8 @@ export interface IBillForm {
   prevWaterUsage: number;
   waterUnit: number;
   waterUsage: number;
+  prevElectricityUnit: number;
+  prevElectricityUsage: number;
   electricityUnit: number;
   electricityUsage: number;
   internet: number;
@@ -152,6 +156,8 @@ export const BillFormSchema: ObjectSchema<IBillForm> = yup.object().shape({
   prevWaterUsage: yup.number().required(),
   waterUnit: yup.number().required(),
   waterUsage: yup.number().required(),
+  prevElectricityUnit: yup.number().required(),
+  prevElectricityUsage: yup.number().required(),
   electricityUnit: yup.number().required(),
   electricityUsage: yup.number().required(),
   internet: yup.number().required(),

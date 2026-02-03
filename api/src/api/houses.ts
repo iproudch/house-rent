@@ -3,7 +3,8 @@ export type House = {
   name: string;
   rent_base: number;
   internet_base?: number;
-  // add fields you actually have
+  water_unit_base?: number;
+  electricity_unit_base?: number;
 };
 
 export const fetchHouses = async (): Promise<House[]> => {

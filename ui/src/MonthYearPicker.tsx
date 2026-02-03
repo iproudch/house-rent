@@ -1,5 +1,5 @@
-import React, { ReactElement, useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { type ReactElement, useCallback, useEffect, useState } from "react";
 
 const MONTHS = [
   "January",

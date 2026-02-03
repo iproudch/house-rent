@@ -5,6 +5,7 @@ import { useHouses } from "../../hooks/useHouses";
 import MonthYearPicker from "../../MonthYearPicker";
 import { usePreviousBill } from "../../hooks/usePreviousBill";
 import { toBillingMonth } from "../../utils/billing-month";
+import type { IBill } from "../../../@types/bill";
 
 export default function BillForm(): ReactElement {
   const formRef = useRef<HTMLFormElement>(null);
@@ -42,7 +43,7 @@ function BillFormContent() {
     const user = houseUsers?.find((house) => house.id === houseId);
     if (!user) return;
     setValue("rent", user.rent_base);
-    setValue("internet", user.internet_base);
+    setValue("internet", user.internet_base || 0);
   };
 
   const onChangeBillingMonth = () => {
@@ -74,10 +75,11 @@ function BillFormContent() {
       setValue("prevElectricityUsage", 0);
       return;
     }
-    setValue("prevWaterUnit", prevBill.water_unit);
-    setValue("prevWaterUsage", prevBill.water_usage);
-    setValue("prevElectricityUnit", prevBill.electricity_unit);
-    setValue("prevElectricityUsage", prevBill.electricity_usage);
+    const prevBillData = prevBill as unknown as IBill;
+    setValue("prevWaterUnit", prevBillData?.water_unit || 0);
+    setValue("prevWaterUsage", prevBillData?.water_usage || 0);
+    setValue("prevElectricityUnit", prevBillData?.electricity_unit || 0);
+    setValue("prevElectricityUsage", prevBillData?.electricity_usage || 0);
   }, [prevBill, setValue]);
 
   return (
@@ -170,7 +172,7 @@ function BillFormContent() {
                     type="number"
                     id="waterUnit"
                     {...register("waterUnit")}
-                    onChange={(e) => onChangeWaterUnit(e.target.value)}
+                    onChange={(e) => onChangeWaterUnit(Number(e.target.value))}
                     placeholder="Unit"
                     required
                     className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/5 transition-all duration-200"
@@ -233,7 +235,9 @@ function BillFormContent() {
                     type="number"
                     id="electricityUnit"
                     {...register("electricityUnit")}
-                    onChange={(e) => onChangeElectricityUnit(e.target.value)}
+                    onChange={(e) =>
+                      onChangeElectricityUnit(Number(e.target.value))
+                    }
                     placeholder="Unit"
                     required
                     className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/5 transition-all duration-200"
