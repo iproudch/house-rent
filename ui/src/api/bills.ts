@@ -10,14 +10,12 @@ type AddBillPayload = {
   internet?: number;
 };
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 export const getPreviousBill = async (params: {
   houseId: string;
   billingMonth: string;
 }): Promise<IBill | null> => {
-  const res = await axios.get(
-    `${import.meta.env.VITE_API_URL}/api/bills/prev-bill`,
-    { params },
-  );
+  const res = await axios.get(`${API_URL}/api/bills/prev-bill`, { params });
 
   return res.data;
 };
@@ -27,7 +25,7 @@ export const addBill = async (payload: AddBillPayload): Promise<IBill> => {
   const total =
     Number(water) + Number(electricity) + Number(rent) + Number(internet || 0);
 
-  const res = await axios.post(`/api/bills/${houseId}`, {
+  const res = await axios.post(`${API_URL}/api/bills/${houseId}`, {
     water,
     electricity,
     rent,
