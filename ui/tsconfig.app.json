@@ -25,5 +25,5 @@
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"],
-  "exclude": ["../api"]
+  "exclude": ["../api", "node_modules"]
 }
