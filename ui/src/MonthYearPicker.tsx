@@ -1,20 +1,7 @@
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { type ReactElement, useCallback, useEffect, useState } from "react";
+import { MONTHS } from "./constants/month";
 
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 type MonthYearPickerProps = {
   label?: string;

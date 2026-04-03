@@ -9,7 +9,7 @@ export const useAddBill = () => {
 
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["bills", data.house_id],
+        queryKey: ["bills", data.houseId],
       });
     },
   });

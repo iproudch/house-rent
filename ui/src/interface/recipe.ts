@@ -1,10 +1,12 @@
 interface IReceiptItem {
   name: string;
-  previous: string;
-  current: string;
-  units: string;
-  price: string;
-  amount: string;
+  previous: number;
+  current: number;
+  units: number;
+  price: number;
+  amount: number;
+    waterRateUnit?: number
+  electricityRateUnit?: number
 }
 
 export interface IReceiptData {
@@ -12,7 +14,8 @@ export interface IReceiptData {
   month: string;
   year: string;
   items: IReceiptItem[];
-  internet: string;
-  houseRent: string;
-  total: string;
+  internet: number;
+  houseRent: number;
+  total: number;
+
 }
