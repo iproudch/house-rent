@@ -79,13 +79,13 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
   xPos += colWidths.item;
   doc.text("เลขครั้งก่อน", xPos, yPos + 7);
   xPos += colWidths.previous;
-  doc.text("เลขครั้งล่าสุด", xPos, yPos + 7);
+  doc.text("เลขครั้งปัจจุบัน", xPos, yPos + 7);
   xPos += colWidths.current;
   doc.text("จำนวนหน่วย", xPos, yPos + 7);
   xPos += colWidths.units;
   doc.text("หน่วยละ", xPos, yPos + 7);
   xPos += colWidths.price;
-  doc.text("ค่าเงิน (บาท)", xPos, yPos + 7);
+  doc.text("รวม (บาท)", xPos, yPos + 7);
 
   yPos += 10;
 
@@ -99,24 +99,32 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
     xPos = margin + 2;
     doc.text(item.name, xPos, yPos + 7);
     xPos += colWidths.item;
-    doc.text(item.previous, xPos, yPos + 7);
+    doc.text(convertToString(item.previous), xPos, yPos + 7);
     xPos += colWidths.previous;
-    doc.text(item.current, xPos, yPos + 7);
+    doc.text(convertToString(item.current), xPos, yPos + 7);
     xPos += colWidths.current;
-    doc.text(item.units, xPos, yPos + 7);
+    doc.text(convertToString(item.units), xPos, yPos + 7);
     xPos += colWidths.units;
-    doc.text(item.price, xPos, yPos + 7);
+    doc.text(item.price.toString(), xPos, yPos + 7);
     xPos += colWidths.price;
-    doc.text(item.amount, xPos, yPos + 7, { align: "right" });
+    doc.text(item.amount.toString(), pageWidth - margin - 2, yPos + 7, { align: "right" });
 
     yPos += 10;
   });
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(margin, yPos, pageWidth - 2 * margin, 10, "F");
+  doc.text("ค่า Internet", margin + 2, yPos + 7);
+  doc.text(convertToString(receiptData.internet), pageWidth - margin - 2, yPos + 7, {
+    align: "right",
+  });
+  yPos += 10;
 
   // House rent row
   doc.setFillColor(255, 255, 255);
   doc.rect(margin, yPos, pageWidth - 2 * margin, 10, "F");
   doc.text("ค่าเช่าบ้าน", margin + 2, yPos + 7);
-  doc.text(receiptData.houseRent, pageWidth - margin - 2, yPos + 7, {
+  doc.text(convertToString(receiptData.houseRent), pageWidth - margin - 2, yPos + 7, {
     align: "right",
   });
   yPos += 10;
@@ -127,7 +135,7 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
   doc.setFontSize(12);
   doc.setFont("Sarabun");
   doc.text("รวม", margin + 2, yPos + 8);
-  doc.text(receiptData.total, pageWidth - margin - 2, yPos + 8, {
+  doc.text(convertToString(receiptData.total), pageWidth - margin - 2, yPos + 8, {
     align: "right",
   });
   doc.setFont("Sarabun", "normal");
@@ -159,3 +167,5 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
     `receipt_${receiptData.houseNumber.replace(/\s/g, "_")}_${receiptData.month}_${receiptData.year}.pdf`,
   );
 };
+
+const convertToString = (val: string|number) => val.toString()

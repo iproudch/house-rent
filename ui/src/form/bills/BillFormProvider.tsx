@@ -8,9 +8,10 @@ import {
 } from "react-hook-form";
 import * as yup from "yup";
 import { ObjectSchema } from "yup";
-// import { useAddBill } from "../../hooks/useAddBill";
+import { useAddBill } from "../../hooks/useAddBill";
 import { generateBillPDF } from "../../utils/pdf";
 import type { IReceiptData } from "../../interface/recipe";
+import { MONTHS } from "../../constants/month";
 
 type BillFormProviderProps = {
   children: React.ReactNode | React.ReactNode[];
@@ -21,7 +22,7 @@ export default function BillFormProvider(
   props: BillFormProviderProps,
 ): ReactElement {
   const { children, formRef } = props;
-  // const { mutate, isPending, error } = useAddBill();
+  const { mutateAsync } = useAddBill();
 
   const defaultValues: IBillForm = useMemo(
     () => ({
@@ -30,10 +31,12 @@ export default function BillFormProvider(
       prevWaterUsage: 0,
       waterUnit: 0,
       waterUsage: 0,
+      waterRateUnit: 0,
       prevElectricityUnit: 0,
       prevElectricityUsage: 0,
       electricityUnit: 0,
       electricityUsage: 0,
+      electricityRateUnit: 0,
       internet: 0,
       rent: 0,
       billingMonth: new Date().toISOString().slice(0, 7),
@@ -71,42 +74,52 @@ export default function BillFormProvider(
       internet,
       billingMonth,
       rent,
+      waterRateUnit,
+      electricityRateUnit,
     } = data;
     try {
-      // mutate({
+      // await mutateAsync({
       //   houseId,
-      //   water,
-      //   internet,
-      //   electricityUnit,
-      //   electricityUsage,
       //   billingMonth,
+      //   water: waterUsage,
+      //   electricity: electricityUsage,
+      //   waterUnit,
+      //   electricityUnit,
+      //   waterUsageUnits: waterUnit - prevWaterUnit,
+      //   electricityUsageUnits: electricityUnit - prevElectricityUnit,
+      //   internet,
       //   rent,
       // });
+
+      const [year, month] = billingMonth.split("-");
+  
+      const monthName = MONTHS[parseInt(month, 10) - 1];
+
       const billData: IReceiptData = {
         houseNumber: houseId,
-        month: billingMonth,
-        year: billingMonth.slice(0, 4),
+        month: `${monthName} ${year}`,
+        year,
         items: [
           {
             name: "ค่าน้ำ",
-            previous: prevWaterUnit.toString(),
-            current: waterUnit.toString(),
-            units: (waterUnit - prevWaterUnit).toString(),
-            price: "6.00",
-            amount: waterUsage.toString(),
+            previous: prevWaterUnit,
+            current: waterUnit,
+            units: (waterUnit - prevWaterUnit),
+            price: waterRateUnit,
+            amount: waterUsage,
           },
           {
             name: "ค่าไฟ",
-            previous: prevElectricityUnit.toString(),
-            current: electricityUnit.toString(),
-            units: (electricityUnit - prevElectricityUnit).toString(),
-            price: "10.00",
-            amount: electricityUsage.toString(),
+            previous: prevElectricityUnit,
+            current: electricityUnit,
+            units: (electricityUnit - prevElectricityUnit),
+            price: electricityRateUnit,
+            amount: electricityUsage,
           },
         ],
-        internet: internet.toString(),
-        houseRent: rent.toString(),
-        total: (waterUsage + electricityUsage + rent).toString(),
+        internet: internet,
+        houseRent: rent,
+        total: (waterUsage + electricityUsage + internet + rent),
       };
       generateBillPDF(billData);
     } catch (e) {
@@ -142,10 +155,12 @@ export interface IBillForm {
   prevWaterUsage: number;
   waterUnit: number;
   waterUsage: number;
+  waterRateUnit: number;
   prevElectricityUnit: number;
   prevElectricityUsage: number;
   electricityUnit: number;
   electricityUsage: number;
+  electricityRateUnit: number;
   internet: number;
   rent: number;
   billingMonth: string;
@@ -157,10 +172,12 @@ export const BillFormSchema: ObjectSchema<IBillForm> = yup.object().shape({
   prevWaterUsage: yup.number().required(),
   waterUnit: yup.number().required(),
   waterUsage: yup.number().required(),
+  waterRateUnit: yup.number().required(),
   prevElectricityUnit: yup.number().required(),
   prevElectricityUsage: yup.number().required(),
   electricityUnit: yup.number().required(),
   electricityUsage: yup.number().required(),
+  electricityRateUnit: yup.number().required(),
   internet: yup.number().required(),
   rent: yup.number().required(),
   billingMonth: yup.string().required(),
