@@ -1,11 +1,11 @@
 export interface IBill {
   id: string;
-  house_id: string;
+  houseId: string;
   billingMonth: string;
-  electricity_unit: number;
-  electricity_usage: number;
-  water_unit: number;
-  water_usage: number;
+  electricityUnit: number;
+  electricityUsage: number;
+  waterUnit: number;
+  waterUsage: number;
   rent: number;
   internet?: number;
 }

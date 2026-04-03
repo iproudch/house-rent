@@ -13,12 +13,21 @@ router.get("/", async (_req, res) => {
     return res.status(400).json({ error: error.message });
   }
 
-  res.json(data);
+  return res.json(data);
 });
 
 router.post("/:houseId", async (req, res) => {
   const { houseId } = req.params;
-  const { electricity, water, rent, internet, billing_month } = req.body;
+  const {
+    electricity_unit,
+    water_unit,
+    electricity_usage,
+    water_usage,
+    rent,
+    internet,
+    billing_month,
+    total,
+  } = req.body;
 
   if (!billing_month) {
     return res.status(400).json({ error: "billing_month is required" });
@@ -29,10 +38,13 @@ router.post("/:houseId", async (req, res) => {
     .insert({
       house_id: houseId,
       billing_month,
-      electricity,
-      water,
+      electricity_unit,
+      water_unit,
+      electricity_usage,
+      water_usage,
       rent,
       internet,
+      total,
     })
     .select()
     .single();
@@ -83,7 +95,6 @@ router.get("/prev-bill", async (req, res) => {
     return res.status(500).json(error);
   }
 
-  // 🔥 ไม่มี = null ชัดเจน
   return res.status(200).json(prevBill ?? null);
 });
 

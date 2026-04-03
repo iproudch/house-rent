@@ -7,7 +7,7 @@ export type House = {
   electricity_unit_base?: number;
 };
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export const fetchHouses = async (): Promise<House[]> => {
   const res = await fetch(`${API_URL}/api/houses`);
