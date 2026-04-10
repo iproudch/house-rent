@@ -1,18 +1,20 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "./hooks/useAuth";
 
 export default function Navbar() {
   const { signOut } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <nav className="bg-zinc-900 border-b border-zinc-800 px-6 py-3 flex items-center justify-between">
       <div className="flex items-center gap-6">
-        <span className="text-white font-semibold text-sm">House Rent</span>
+        <span className="text-white font-semibold text-sm">{t("common.appName")}</span>
         <Link
           to="/generate-bill"
           className="text-zinc-400 hover:text-white text-sm transition-colors"
         >
-          Generate Bill
+          {t("nav.generateBill")}
         </Link>
       </div>
 
@@ -20,7 +22,7 @@ export default function Navbar() {
         onClick={signOut}
         className="text-zinc-400 hover:text-white text-sm transition-colors cursor-pointer"
       >
-        Logout
+        {t("nav.logout")}
       </button>
     </nav>
   );

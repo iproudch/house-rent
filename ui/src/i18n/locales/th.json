@@ -1,0 +1,44 @@
+{
+  "common": {
+    "appName": "House Rent"
+  },
+  "login": {
+    "signInTitle": "เข้าสู่ระบบบัญชีของคุณ",
+    "signUpTitle": "สร้างบัญชีใหม่",
+    "email": "อีเมล",
+    "emailPlaceholder": "you@example.com",
+    "password": "รหัสผ่าน",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "เข้าสู่ระบบ",
+    "signUp": "สมัครสมาชิก",
+    "loading": "...",
+    "confirmEmail": "กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีของคุณ",
+    "noAccount": "ยังไม่มีบัญชี?",
+    "hasAccount": "มีบัญชีอยู่แล้ว?"
+  },
+  "nav": {
+    "generateBill": "สร้างใบแจ้งหนี้",
+    "logout": "ออกจากระบบ"
+  },
+  "bill": {
+    "title": "จัดการบิล",
+    "house": "บ้าน",
+    "selectHouse": "เลือกบ้าน",
+    "billingMonth": "เดือนที่เรียกเก็บ",
+    "water": "น้ำ",
+    "electricity": "ไฟฟ้า",
+    "internet": "อินเทอร์เน็ต",
+    "rent": "ค่าเช่า",
+    "prevUnit": "ค่ามิเตอร์เดือนที่ผ่านมา",
+    "prevUse": "ยูนิตที่ใช้เดือนที่ผ่านมา",
+    "prevAmount": "ยอดเงินที่ชำระเดือนที่ผ่านมา",
+    "currentUnit": "ค่ามิเตอร์ปัจจุบัน",
+    "currentUse": "ยูนิตที่ใช้เดือนนี้",
+    "currentAmount": "ยอดเงินที่ต้องชำระเดือนนี้",
+    "unitPlaceholder": "หน่วย",
+    "amountPlaceholder": "จำนวนเงิน",
+    "enterAmount": "กรอกจำนวนเงิน",
+    "perUnitRate": "{{rate}}฿ ต่อหน่วย",
+    "generateBill": "สร้างบิล"
+  }
+}

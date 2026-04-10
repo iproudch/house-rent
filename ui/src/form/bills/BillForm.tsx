@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import BillFormProvider, { type IBillForm } from "./BillFormProvider";
 import { useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { useHouses } from "../../hooks/useHouses";
 import MonthYearPicker from "../../MonthYearPicker";
 import { usePreviousBill } from "../../hooks/usePreviousBill";
@@ -19,6 +20,7 @@ export default function BillForm(): ReactElement {
 
 function BillFormContent() {
   const { register, setValue, watch } = useFormContext<IBillForm>();
+  const { t } = useTranslation();
   const now = new Date();
   const [billingMonth, setBillingMonth] = useState(
     `${MONTHS[now.getMonth()]} ${now.getFullYear()}`,
@@ -96,7 +98,7 @@ function BillFormContent() {
       <div className="w-full max-w-4xl">
         <div className="mb-10">
           <h1 className="text-4xl font-semibold text-zinc-900 mb-2 tracking-tight">
-            Bill Management
+            {t("bill.title")}
           </h1>
         </div>
 
@@ -107,7 +109,7 @@ function BillFormContent() {
                 htmlFor="houseId"
                 className="block text-sm font-medium text-zinc-900 mb-2"
               >
-                House
+                {t("bill.house")}
               </label>
               <select
                 id="houseId"
@@ -116,7 +118,7 @@ function BillFormContent() {
                   onChange: (e) => onSelectHouseUser(e.target.value),
                 })}
               >
-                <option value="">Select a house</option>
+                <option value="">{t("bill.selectHouse")}</option>
                 {houseUsers?.map((house) => (
                   <option key={house.id} value={house.id}>
                     {house.name}
@@ -130,7 +132,7 @@ function BillFormContent() {
                 htmlFor="billingMonth"
                 className="block text-sm font-medium text-zinc-900 mb-2"
               >
-                Billing Month
+                {t("bill.billingMonth")}
               </label>
               <MonthYearPicker
                 setValue={onChangeBillingMonth}
@@ -141,13 +143,13 @@ function BillFormContent() {
             {/* Water Section */}
             <div className="flex flex-col items-start">
               <label className="block text-sm font-medium text-zinc-900 mb-3">
-                Water
+                {t("bill.water")}
               </label>
               <div className="w-full space-y-3">
                 <div className="grid grid-cols-3 gap-4">
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Previous Unit
+                      {t("bill.prevUnit")}
                     </label>
                     <input
                       type="number"
@@ -158,7 +160,7 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Previous Use
+                      {t("bill.prevUse")}
                     </label>
                     <input
                       type="number"
@@ -169,7 +171,7 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Previous Amount
+                      {t("bill.prevAmount")}
                     </label>
                     <input
                       type="number"
@@ -183,11 +185,11 @@ function BillFormContent() {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Current Unit
+                      {t("bill.currentUnit")}
                     </label>
                     <input
                       type="number"
-                      placeholder="Unit"
+                      placeholder={t("bill.unitPlaceholder")}
                       className={activeInput}
                       {...register("waterUnit", {
                         valueAsNumber: true,
@@ -198,11 +200,11 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Current Use
+                      {t("bill.currentUse")}
                     </label>
                     <input
                       type="number"
-                      placeholder="Units"
+                      placeholder={t("bill.unitPlaceholder")}
                       readOnly
                       className={calculatedInput}
                       value={
@@ -212,17 +214,17 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Current Amount
+                      {t("bill.currentAmount")}
                     </label>
                     <input
                       type="number"
-                      placeholder="Amount"
+                      placeholder={t("bill.amountPlaceholder")}
                       readOnly
                       className={calculatedInput}
                       {...register("waterUsage", { valueAsNumber: true })}
                     />
                     <p className="mt-1.5 text-xs text-zinc-500">
-                      {waterRateUnit}฿ per unit
+                      {t("bill.perUnitRate", { rate: waterRateUnit })}
                     </p>
                   </div>
                 </div>
@@ -232,13 +234,13 @@ function BillFormContent() {
             {/* Electricity Section */}
             <div className="flex flex-col items-start">
               <label className="block text-sm font-medium text-zinc-900 mb-3">
-                Electricity
+                {t("bill.electricity")}
               </label>
               <div className="w-full space-y-3">
                 <div className="grid grid-cols-3 gap-4">
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Previous Unit
+                      {t("bill.prevUnit")}
                     </label>
                     <input
                       type="number"
@@ -251,7 +253,7 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Previous Use
+                      {t("bill.prevUse")}
                     </label>
                     <input
                       type="number"
@@ -264,7 +266,7 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Previous Amount
+                      {t("bill.prevAmount")}
                     </label>
                     <input
                       type="number"
@@ -278,11 +280,11 @@ function BillFormContent() {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Current Unit
+                      {t("bill.currentUnit")}
                     </label>
                     <input
                       type="number"
-                      placeholder="Unit"
+                      placeholder={t("bill.unitPlaceholder")}
                       className={activeInput}
                       {...register("electricityUnit", {
                         valueAsNumber: true,
@@ -293,11 +295,11 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Current Use
+                      {t("bill.currentUse")}
                     </label>
                     <input
                       type="number"
-                      placeholder="Units"
+                      placeholder={t("bill.unitPlaceholder")}
                       readOnly
                       className={calculatedInput}
                       value={
@@ -307,17 +309,17 @@ function BillFormContent() {
                   </div>
                   <div className="flex flex-col items-start">
                     <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      Current Amount
+                      {t("bill.currentAmount")}
                     </label>
                     <input
                       type="number"
-                      placeholder="Amount"
+                      placeholder={t("bill.amountPlaceholder")}
                       readOnly
                       className={calculatedInput}
                       {...register("electricityUsage", { valueAsNumber: true })}
                     />
                     <p className="mt-1.5 text-xs text-zinc-500">
-                      {electricityRateUnit}฿ per unit
+                      {t("bill.perUnitRate", { rate: electricityRateUnit })}
                     </p>
                   </div>
                 </div>
@@ -330,12 +332,12 @@ function BillFormContent() {
                 htmlFor="internet"
                 className="block text-sm font-medium text-zinc-900 mb-2"
               >
-                Internet
+                {t("bill.internet")}
               </label>
               <input
                 id="internet"
                 type="number"
-                placeholder="Enter amount"
+                placeholder={t("bill.enterAmount")}
                 className={activeInput}
                 {...register("internet", { valueAsNumber: true })}
               />
@@ -347,12 +349,12 @@ function BillFormContent() {
                 htmlFor="rent"
                 className="block text-sm font-medium text-zinc-900 mb-2"
               >
-                Rent
+                {t("bill.rent")}
               </label>
               <input
                 id="rent"
                 type="number"
-                placeholder="Enter amount"
+                placeholder={t("bill.enterAmount")}
                 className={activeInput}
                 {...register("rent", { valueAsNumber: true })}
               />
@@ -364,7 +366,7 @@ function BillFormContent() {
                 type="submit"
                 className="w-full py-3.5 bg-zinc-900 text-white font-medium text-sm rounded-xl hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
               >
-                Generate Bill
+                {t("bill.generateBill")}
               </button>
             </div>
           </div>
