@@ -1,6 +1,12 @@
 import { jsPDF } from "jspdf";
 import type { IReceiptData } from "../interface/recipe";
 import SARABUN_FONT from "../fonts/sarabunFont";
+import LOGO_IMAGE from "../assets/logoImage";
+import QR_PAYMENT from "../assets/qrPayment";
+
+const GR = 99, GG = 115, GB = 86;
+const LR = 165, LG = 180, LB = 150;
+const PR = 230, PG = 237, PB = 224;
 
 const addThaiFont = (doc: jsPDF) => {
   doc.addFileToVFS("Sarabun-Regular.ttf", SARABUN_FONT);
@@ -22,45 +28,32 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
   const margin = 20;
   let yPos = 20;
 
-  // Header - Company Logo and Info
-  doc.setFillColor(76, 175, 80);
-  doc.rect(margin, yPos, 30, 15, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.text("L", margin + 3, yPos + 7);
-  doc.setFontSize(10);
-  doc.text("L HOUSE", margin + 3, yPos + 12);
+  doc.addImage(LOGO_IMAGE, "JPEG", margin, yPos, 38, 38);
 
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(9);
-  const contactX = pageWidth - margin - 60;
-  doc.text("123 ม.16", contactX, yPos + 3);
-  doc.text("อ.รัตนบุรี จ.สุรินทร์ 32130", contactX, yPos + 7);
-  doc.text("โทร 091-xxxxxxx", contactX, yPos + 11);
+  const contactX = pageWidth - margin - 62;
+  doc.text("149 ม.9", contactX, yPos + 10);
+  doc.text("อ.รัตนบุรี จ.สุรินทร์ 32130", contactX, yPos + 15);
+  doc.text("โทร 065-6295411", contactX, yPos + 20);
 
-  yPos += 25;
+  yPos += 38;
 
-  // Title
+  // === TITLE ===
   doc.setFontSize(18);
-  doc.setTextColor(76, 175, 80);
-  doc.text("บิลเรียกเก็บค่าเช่าบ้าน", pageWidth / 2, yPos, {
-    align: "center",
-  });
+  doc.setTextColor(GR, GG, GB);
+  doc.text("บิลเรียกเก็บค่าเช่าบ้าน", pageWidth / 2, yPos, { align: "center" });
 
   yPos += 12;
 
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
   doc.text(`บ้านเลขที่ ${receiptData.houseNumber}`, margin, yPos);
-  doc.text(`ประจำเดือน ${receiptData.month}`, pageWidth / 2, yPos, {
-    align: "center",
-  });
-  doc.text(receiptData.year, pageWidth - margin - 20, yPos);
+  doc.text(`ประจำเดือน ${receiptData.month}`, pageWidth / 2, yPos, { align: "center" });
 
   yPos += 10;
 
-  // Table Header
-  doc.setFillColor(144, 238, 144);
+  doc.setFillColor(LR, LG, LB);
   doc.rect(margin, yPos, pageWidth - 2 * margin, 10, "F");
 
   doc.setFontSize(10);
@@ -89,10 +82,10 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
 
   yPos += 10;
 
-  // Table Rows - Items
+  // === TABLE ROWS ===
   receiptData.items.forEach((item, index) => {
     if (index % 2 === 0) {
-      doc.setFillColor(240, 255, 240);
+      doc.setFillColor(PR, PG, PB);
       doc.rect(margin, yPos, pageWidth - 2 * margin, 10, "F");
     }
 
@@ -112,7 +105,7 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
     yPos += 10;
   });
 
-  doc.setFillColor(255, 255, 255);
+  doc.setFillColor(PR, PG, PB);
   doc.rect(margin, yPos, pageWidth - 2 * margin, 10, "F");
   doc.text("ค่า Internet", margin + 2, yPos + 7);
   doc.text(convertToString(receiptData.internet), pageWidth - margin - 2, yPos + 7, {
@@ -120,7 +113,6 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
   });
   yPos += 10;
 
-  // House rent row
   doc.setFillColor(255, 255, 255);
   doc.rect(margin, yPos, pageWidth - 2 * margin, 10, "F");
   doc.text("ค่าเช่าบ้าน", margin + 2, yPos + 7);
@@ -130,7 +122,7 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
   yPos += 10;
 
   // Total row
-  doc.setFillColor(144, 238, 144);
+  doc.setFillColor(LR, LG, LB);
   doc.rect(margin, yPos, pageWidth - 2 * margin, 12, "F");
   doc.setFontSize(12);
   doc.setFont("Sarabun");
@@ -141,11 +133,14 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
   doc.setFont("Sarabun", "normal");
   yPos += 17;
 
+  // QR + notes side by side
+  const qrSize = 35;
+  const qrX = pageWidth - margin - qrSize;
+  doc.addImage(QR_PAYMENT, "JPEG", qrX, yPos, qrSize, qrSize);
+
   doc.setFontSize(9);
   const instructions = [
-    "หมายเหตุ: 1. กรุณาโอนเงินเข้าบัญชี",
-    "             - บัญชีธนาคารกรุงไทย   เลขที่     xxx-xxx-xxxxxx นางสาวเจ้าของ บ้าน",
-    "                                        เบอร์โทรศัพท์  091-2345678",
+    "หมายเหตุ: 1. กรุณาโอนเงินเข้าบัญชีตาม QR-Code  ที่กำหนด",
     "         2. จ่ายค่าเช่าไม่เกินวันที่ 1-5 หลังจากนั้นปรับวันละ 200 บาท",
   ];
 
@@ -153,9 +148,9 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
     doc.text(line, margin, yPos + index * 5);
   });
 
-  yPos += instructions.length * 5 + 5;
+  yPos += Math.max(instructions.length * 5, qrSize) + 15;
 
-  // Signature line
+  // Signature
   doc.setTextColor(0, 0, 0);
   doc.text(
     "ลงชื่อ ......................................... ผู้เช่าบ้าน",
@@ -168,4 +163,4 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
   );
 };
 
-const convertToString = (val: string|number) => val.toString()
+const convertToString = (val: string | number) => val.toString();

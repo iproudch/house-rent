@@ -8,9 +8,10 @@ import {
 } from "react-hook-form";
 import * as yup from "yup";
 import type { ObjectSchema } from "yup";
-import { MONTHS } from "../../constants/month";
+import { MONTHS_TH } from "../../constants/month";
 import type { IReceiptData } from "../../interface/recipe";
 import { generateBillPDF } from "../../utils/pdf";
+import { useHouses } from "../../hooks/useHouses";
 
 type BillFormProviderProps = {
   children: React.ReactNode | React.ReactNode[];
@@ -21,6 +22,7 @@ export default function BillFormProvider(
   props: BillFormProviderProps,
 ): ReactElement {
   const { children, formRef } = props;
+  const { data: houseUsers } = useHouses();
 
   const defaultValues: IBillForm = useMemo(
     () => ({
@@ -91,10 +93,10 @@ export default function BillFormProvider(
 
       const [year, month] = billingMonth.split("-");
   
-      const monthName = MONTHS[parseInt(month, 10) - 1];
+      const monthName = MONTHS_TH[parseInt(month, 10) - 1];
 
       const billData: IReceiptData = {
-        houseNumber: houseId,
+        houseNumber: houseUsers?.find((house) => house.id === houseId)?.name || "",
         month: `${monthName} ${year}`,
         year,
         items: [

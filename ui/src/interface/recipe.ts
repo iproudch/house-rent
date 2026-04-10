@@ -5,7 +5,7 @@ interface IReceiptItem {
   units: number;
   price: number;
   amount: number;
-    waterRateUnit?: number
+  waterRateUnit?: number
   electricityRateUnit?: number
 }
 
@@ -17,5 +17,4 @@ export interface IReceiptData {
   internet: number;
   houseRent: number;
   total: number;
-
 }
