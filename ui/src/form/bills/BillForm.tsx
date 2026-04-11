@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
-import BillFormProvider, { type IBillForm } from "./BillFormProvider";
+import BillFormProvider, { useBillFormContext, type IBillForm } from "./BillFormProvider";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useHouses } from "../../hooks/useHouses";
 import MonthYearPicker from "../../MonthYearPicker";
 import { usePreviousBill } from "../../hooks/usePreviousBill";
 import { toBillingMonth } from "../../utils/billing-month";
-import { MONTHS } from "../../constants/month";
+import { MONTHS, MONTHS_TH } from "../../constants/month";
 
 export default function BillForm(): ReactElement {
   const formRef = useRef<HTMLFormElement>(null);
@@ -21,12 +21,14 @@ export default function BillForm(): ReactElement {
 function BillFormContent() {
   const { register, setValue, watch } = useFormContext<IBillForm>();
   const { t } = useTranslation();
+  const { currentBill } = useBillFormContext();
   const now = new Date();
   const [billingMonth, setBillingMonth] = useState(
     `${MONTHS[now.getMonth()]} ${now.getFullYear()}`,
   );
 
   const houseId = watch("houseId");
+  const watchedBillingMonth = watch("billingMonth");
   const prevWaterUnit = watch("prevWaterUnit") || 0;
   const prevElectricityUnit = watch("prevElectricityUnit") || 0;
   const prevWaterUsage = watch("prevWaterUsage") || 0;
@@ -86,6 +88,22 @@ function BillFormContent() {
     setValue("prevElectricityUsage", prevBill.electricityUsage || 0);
   }, [prevBill, setValue]);
 
+  useEffect(() => {
+    if (!currentBill) return;
+    setValue("waterUnit", currentBill.waterUnit || 0);
+    setValue("waterUsage", (currentBill.waterUsage || 0) * waterRateUnit);
+    setValue("electricityUnit", currentBill.electricityUnit || 0);
+    setValue("electricityUsage", (currentBill.electricityUsage || 0) * electricityRateUnit);
+    setValue("rent", currentBill.rent || 0);
+    setValue("internet", currentBill.internet || 0);
+  }, [currentBill, waterRateUnit, electricityRateUnit, setValue]);
+
+  const warningMonthName = useMemo(() => {
+    if (!watchedBillingMonth) return "";
+    const [year, month] = watchedBillingMonth.split("-");
+    return `${MONTHS_TH[parseInt(month, 10) - 1]} ${year}`;
+  }, [watchedBillingMonth]);
+
   const disabledInput =
     "w-full px-4 py-3 bg-gray-100 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all duration-200";
   const activeInput =
@@ -140,6 +158,16 @@ function BillFormContent() {
               />
             </div>
 
+            {/* Existing bill warning */}
+            {currentBill && (
+              <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl">
+                <span className="text-amber-500 text-lg leading-none mt-0.5">⚠</span>
+                <p className="text-sm text-amber-800 font-medium">
+                  มีใบแจ้งหนี้สำหรับเดือน{warningMonthName}แล้ว กดสร้างบิลเพื่อออกใบแจ้งหนี้อีกครั้ง
+                </p>
+              </div>
+            )}
+
             {/* Water Section */}
             <div className="flex flex-col items-start">
               <label className="block text-sm font-medium text-zinc-900 mb-3">
@@ -189,6 +217,7 @@ function BillFormContent() {
                     </label>
                     <input
                       type="number"
+                      step="any"
                       placeholder={t("bill.unitPlaceholder")}
                       className={activeInput}
                       {...register("waterUnit", {
@@ -284,6 +313,7 @@ function BillFormContent() {
                     </label>
                     <input
                       type="number"
+                      step="any"
                       placeholder={t("bill.unitPlaceholder")}
                       className={activeInput}
                       {...register("electricityUnit", {
@@ -337,6 +367,7 @@ function BillFormContent() {
               <input
                 id="internet"
                 type="number"
+                step="any"
                 placeholder={t("bill.enterAmount")}
                 className={activeInput}
                 {...register("internet", { valueAsNumber: true })}
@@ -354,6 +385,7 @@ function BillFormContent() {
               <input
                 id="rent"
                 type="number"
+                step="any"
                 placeholder={t("bill.enterAmount")}
                 className={activeInput}
                 {...register("rent", { valueAsNumber: true })}

@@ -1,8 +1,16 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useCallback, useEffect, useMemo, type ReactElement } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  type ReactElement,
+} from "react";
 import {
   FormProvider,
   useForm,
+  useWatch,
   type SubmitErrorHandler,
   type SubmitHandler,
 } from "react-hook-form";
@@ -12,6 +20,19 @@ import { MONTHS_TH } from "../../constants/month";
 import type { IReceiptData } from "../../interface/recipe";
 import { generateBillPDF } from "../../utils/pdf";
 import { useHouses } from "../../hooks/useHouses";
+import { useAddBill } from "../../hooks/useAddBill";
+import { useCurrentBill } from "../../hooks/useCurrentBill";
+import type { IBill } from "../../../@types/bill";
+
+type BillFormContextValue = {
+  currentBill: IBill | null | undefined;
+};
+
+const BillFormContext = createContext<BillFormContextValue>({
+  currentBill: undefined,
+});
+
+export const useBillFormContext = () => useContext(BillFormContext);
 
 type BillFormProviderProps = {
   children: React.ReactNode | React.ReactNode[];
@@ -23,6 +44,7 @@ export default function BillFormProvider(
 ): ReactElement {
   const { children, formRef } = props;
   const { data: houseUsers } = useHouses();
+  const { mutateAsync } = useAddBill();
 
   const defaultValues: IBillForm = useMemo(
     () => ({
@@ -56,7 +78,15 @@ export default function BillFormProvider(
     resolver,
   });
 
-  const { reset, handleSubmit } = formMethods;
+  const { reset, handleSubmit, control } = formMethods;
+
+  const watchedHouseId = useWatch({ control, name: "houseId" });
+  const watchedBillingMonth = useWatch({ control, name: "billingMonth" });
+
+  const { data: currentBill } = useCurrentBill({
+    houseId: watchedHouseId || undefined,
+    billingMonth: watchedBillingMonth || undefined,
+  });
 
   const onReset = useCallback(() => {
     reset(defaultValues);
@@ -78,21 +108,23 @@ export default function BillFormProvider(
       electricityRateUnit,
     } = data;
     try {
-      // await mutateAsync({
-      //   houseId,
-      //   billingMonth,
-      //   water: waterUsage,
-      //   electricity: electricityUsage,
-      //   waterUnit,
-      //   electricityUnit,
-      //   waterUsageUnits: waterUnit - prevWaterUnit,
-      //   electricityUsageUnits: electricityUnit - prevElectricityUnit,
-      //   internet,
-      //   rent,
-      // });
+      if (!currentBill) {
+        await mutateAsync({
+          houseId,
+          billingMonth,
+          water: waterUsage,
+          electricity: electricityUsage,
+          waterUnit,
+          electricityUnit,
+          waterUsageUnits: waterUnit - prevWaterUnit,
+          electricityUsageUnits: electricityUnit - prevElectricityUnit,
+          internet,
+          rent,
+        });
+      }
 
       const [year, month] = billingMonth.split("-");
-  
+
       const monthName = MONTHS_TH[parseInt(month, 10) - 1];
 
       const billData: IReceiptData = {
@@ -104,7 +136,7 @@ export default function BillFormProvider(
             name: "ค่าน้ำ",
             previous: prevWaterUnit,
             current: waterUnit,
-            units: (waterUnit - prevWaterUnit),
+            units: waterUnit - prevWaterUnit,
             price: waterRateUnit,
             amount: waterUsage,
           },
@@ -112,14 +144,14 @@ export default function BillFormProvider(
             name: "ค่าไฟ",
             previous: prevElectricityUnit,
             current: electricityUnit,
-            units: (electricityUnit - prevElectricityUnit),
+            units: electricityUnit - prevElectricityUnit,
             price: electricityRateUnit,
             amount: electricityUsage,
           },
         ],
         internet: internet,
         houseRent: rent,
-        total: (waterUsage + electricityUsage + internet + rent),
+        total: waterUsage + electricityUsage + internet + rent,
       };
       generateBillPDF(billData);
     } catch (e) {
@@ -136,16 +168,18 @@ export default function BillFormProvider(
   }, [defaultValues, reset]);
 
   return (
-    <FormProvider {...formMethods}>
-      <form
-        ref={formRef}
-        id={"bill-form"}
-        onReset={onReset}
-        onSubmit={handleSubmit(onSubmit, onError)}
-      >
-        {children}
-      </form>
-    </FormProvider>
+    <BillFormContext.Provider value={{ currentBill }}>
+      <FormProvider {...formMethods}>
+        <form
+          ref={formRef}
+          id={"bill-form"}
+          onReset={onReset}
+          onSubmit={handleSubmit(onSubmit, onError)}
+        >
+          {children}
+        </form>
+      </FormProvider>
+    </BillFormContext.Provider>
   );
 }
 
