@@ -70,6 +70,32 @@ router.post("/:houseId", async (req, res) => {
   res.status(200).json(data);
 });
 
+router.get("/current-bill", async (req, res) => {
+  const { houseId, billingMonth } = req.query as {
+    houseId?: string;
+    billingMonth?: string;
+  };
+
+  if (!houseId || !billingMonth) {
+    return res
+      .status(400)
+      .json({ message: "houseId and billingMonth are required" });
+  }
+
+  const { data: bill, error } = await supabase
+    .from("bills")
+    .select("*")
+    .eq("house_id", houseId)
+    .eq("billing_month", billingMonth)
+    .maybeSingle();
+
+  if (error) {
+    return res.status(500).json(error);
+  }
+
+  return res.status(200).json(bill ?? null);
+});
+
 router.get("/prev-bill", async (req, res) => {
   const { houseId, billingMonth } = req.query as {
     houseId?: string;

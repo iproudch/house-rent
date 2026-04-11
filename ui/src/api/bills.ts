@@ -29,6 +29,14 @@ const mapBill = (d: any): IBill => ({
   internet: d.internet,
 });
 
+export const getCurrentBill = async (params: {
+  houseId: string;
+  billingMonth: string;
+}): Promise<IBill | null> => {
+  const res = await axios.get(`${API_URL}/api/bills/current-bill`, { params });
+  return res.data ? mapBill(res.data) : null;
+};
+
 export const getPreviousBill = async (params: {
   houseId: string;
   billingMonth: string;
