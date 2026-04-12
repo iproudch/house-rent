@@ -61,7 +61,23 @@ function BillFormContent() {
 
   const onChangeWaterUnit = (current: number) => {
     const useUnit = current - prevWaterUnit;
-    setValue("waterUsage", useUnit * waterRateUnit);
+    let sum = 0;
+
+    for (let i = 1; i <= useUnit; i++) {
+      if (i <= 10) {
+        sum += 10.20;
+      } else if (i <= 20) {
+        sum += 16.00;
+      } else if (i <= 30) {
+        sum += 19.00;
+      } else if (i <= 50) {
+        sum += 21.20; 
+      } else {
+        sum += 99999; //for home usage should not exceed 50 units limit.
+      }
+    }
+
+    setValue("waterUsage", sum.toFixed(2));
   };
 
   const onChangeElectricityUnit = (current: number) => {
@@ -88,8 +104,15 @@ function BillFormContent() {
     setValue("prevElectricityUsage", prevBill.electricityUsage || 0);
   }, [prevBill, setValue]);
 
+  const populatedBillIdRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!currentBill) return;
+    if (!currentBill) {
+      populatedBillIdRef.current = null;
+      return;
+    }
+    if (populatedBillIdRef.current === currentBill.id) return;
+    populatedBillIdRef.current = currentBill.id;
     setValue("waterUnit", currentBill.waterUnit || 0);
     setValue("waterUsage", (currentBill.waterUsage || 0) * waterRateUnit);
     setValue("electricityUnit", currentBill.electricityUnit || 0);
@@ -236,9 +259,7 @@ function BillFormContent() {
                       placeholder={t("bill.unitPlaceholder")}
                       readOnly
                       className={calculatedInput}
-                      value={
-                        (watch("waterUnit") || 0) - prevWaterUnit
-                      }
+                      value={Math.max(0, (watch("waterUnit") || 0) - prevWaterUnit)}
                     />
                   </div>
                   <div className="flex flex-col items-start">
@@ -252,9 +273,9 @@ function BillFormContent() {
                       className={calculatedInput}
                       {...register("waterUsage", { valueAsNumber: true })}
                     />
-                    <p className="mt-1.5 text-xs text-zinc-500">
+                    {/* <p className="mt-1.5 text-xs text-zinc-500">
                       {t("bill.perUnitRate", { rate: waterRateUnit })}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>
@@ -332,9 +353,7 @@ function BillFormContent() {
                       placeholder={t("bill.unitPlaceholder")}
                       readOnly
                       className={calculatedInput}
-                      value={
-                        (watch("electricityUnit") || 0) - prevElectricityUnit
-                      }
+                      value={Math.max(0, (watch("electricityUnit") || 0) - prevElectricityUnit)}
                     />
                   </div>
                   <div className="flex flex-col items-start">
