@@ -8,4 +8,6 @@ export interface IBill {
   waterUsage: number;
   rent: number;
   internet?: number;
+  total?: number;
+  createdAt?: string;
 }

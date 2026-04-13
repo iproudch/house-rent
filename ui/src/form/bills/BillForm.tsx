@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
-import BillFormProvider, { useBillFormContext, type IBillForm } from "./BillFormProvider";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useHouses } from "../../hooks/useHouses";
-import MonthYearPicker from "../../MonthYearPicker";
-import { usePreviousBill } from "../../hooks/usePreviousBill";
-import { toBillingMonth } from "../../utils/billing-month";
 import { MONTHS, MONTHS_TH } from "../../constants/month";
+import { useHouses } from "../../hooks/useHouses";
+import { usePreviousBill } from "../../hooks/usePreviousBill";
+import MonthYearPicker from "../../MonthYearPicker";
+import { toBillingMonth } from "../../utils/billing-month";
+import BillFormProvider, { useBillFormContext, type IBillForm } from "./BillFormProvider";
 
 export default function BillForm(): ReactElement {
   const formRef = useRef<HTMLFormElement>(null);
@@ -15,6 +15,15 @@ export default function BillForm(): ReactElement {
     <BillFormProvider formRef={formRef}>
       <BillFormContent />
     </BillFormProvider>
+  );
+}
+
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white rounded-2xl p-6 card-shadow">
+      <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{title}</h2>
+      {children}
+    </div>
   );
 }
 
@@ -53,31 +62,23 @@ function BillFormContent() {
     setValue("electricityRateUnit", user.electricity_unit_base || 0);
   };
 
-  const onChangeBillingMonth = (value: string) => {
+  const onChangeBillingMonth = useCallback((value: string) => {
     if (!value) return;
     setBillingMonth(value);
     setValue("billingMonth", toBillingMonth(value));
-  };
+  },[setValue]);
 
   const onChangeWaterUnit = (current: number) => {
     const useUnit = current - prevWaterUnit;
     let sum = 0;
-
     for (let i = 1; i <= useUnit; i++) {
-      if (i <= 10) {
-        sum += 10.20;
-      } else if (i <= 20) {
-        sum += 16.00;
-      } else if (i <= 30) {
-        sum += 19.00;
-      } else if (i <= 50) {
-        sum += 21.20; 
-      } else {
-        sum += 99999; //for home usage should not exceed 50 units limit.
-      }
+      if (i <= 10) sum += 10.20;
+      else if (i <= 20) sum += 16.00;
+      else if (i <= 30) sum += 19.00;
+      else if (i <= 50) sum += 21.20;
+      else sum += 99999;
     }
-
-    setValue("waterUsage", sum.toFixed(2));
+    setValue("waterUsage", parseFloat(sum.toFixed(2)));
   };
 
   const onChangeElectricityUnit = (current: number) => {
@@ -128,303 +129,258 @@ function BillFormContent() {
   }, [watchedBillingMonth]);
 
   const disabledInput =
-    "w-full px-4 py-3 bg-gray-100 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all duration-200";
+    "w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-slate-400 text-sm focus:outline-none transition-all";
   const activeInput =
-    "w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/5 transition-all duration-200";
+    "w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder-slate-300 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/10 transition-all";
   const calculatedInput =
-    "w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none transition-all duration-200";
+    "w-full px-4 py-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-700 text-sm font-medium focus:outline-none transition-all";
+  const fieldLabel = "block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2";
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-4xl">
-        <div className="mb-10">
-          <h1 className="text-4xl font-semibold text-zinc-900 mb-2 tracking-tight">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-3xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white tracking-tight">
             {t("bill.title")}
           </h1>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 border border-zinc-200 shadow-sm">
-          <div className="space-y-6">
-            <div className="flex flex-col items-start">
-              <label
-                htmlFor="houseId"
-                className="block text-sm font-medium text-zinc-900 mb-2"
-              >
-                {t("bill.house")}
-              </label>
-              <select
-                id="houseId"
-                className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl text-zinc-900 focus:outline-none focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/5 transition-all duration-200 appearance-none cursor-pointer"
-                {...register("houseId", {
-                  onChange: (e) => onSelectHouseUser(e.target.value),
-                })}
-              >
-                <option value="">{t("bill.selectHouse")}</option>
-                {houseUsers?.map((house) => (
-                  <option key={house.id} value={house.id}>
-                    {house.name}
-                  </option>
-                ))}
-              </select>
+        <div className="space-y-4">
+          {/* House & Month */}
+          <SectionCard title={t("bill.house")}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="houseId" className={fieldLabel}>
+                  {t("bill.house")}
+                </label>
+                <select
+                  id="houseId"
+                  className={`${activeInput} appearance-none cursor-pointer`}
+                  {...register("houseId", {
+                    onChange: (e) => onSelectHouseUser(e.target.value),
+                  })}
+                >
+                  <option value="">{t("bill.selectHouse")}</option>
+                  {houseUsers?.map((house) => (
+                    <option key={house.id} value={house.id}>
+                      {house.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="billingMonthPicker" className={fieldLabel}>
+                  {t("bill.billingMonth")}
+                </label>
+                <MonthYearPicker setValue={onChangeBillingMonth} onChange={ (v)=>onChangeBillingMonth(v)} />
+              </div>
             </div>
 
-            <div className="flex flex-col items-start">
-              <label
-                htmlFor="billingMonth"
-                className="block text-sm font-medium text-zinc-900 mb-2"
-              >
-                {t("bill.billingMonth")}
-              </label>
-              <MonthYearPicker
-                setValue={onChangeBillingMonth}
-                onChange={() => {}}
-              />
-            </div>
-
-            {/* Existing bill warning */}
             {currentBill && (
-              <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl">
-                <span className="text-amber-500 text-lg leading-none mt-0.5">⚠</span>
-                <p className="text-sm text-amber-800 font-medium">
-                  มีใบแจ้งหนี้สำหรับเดือน{warningMonthName}แล้ว กดสร้างบิลเพื่อออกใบแจ้งหนี้อีกครั้ง
+              <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl mt-4">
+                <span className="text-amber-500 text-base leading-none mt-0.5">⚠</span>
+                <p className="text-sm text-amber-700 font-medium">
+                  {t("bill.existingBillWarning", { month: warningMonthName })}
                 </p>
               </div>
             )}
+          </SectionCard>
 
-            {/* Water Section */}
-            <div className="flex flex-col items-start">
-              <label className="block text-sm font-medium text-zinc-900 mb-3">
-                {t("bill.water")}
-              </label>
-              <div className="w-full space-y-3">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.prevUnit")}
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      className={disabledInput}
-                      {...register("prevWaterUnit", { valueAsNumber: true })}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.prevUse")}
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      className={disabledInput}
-                      {...register("prevWaterUsage", { valueAsNumber: true })}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.prevAmount")}
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      value={prevWaterUsage * waterRateUnit}
-                      readOnly
-                      className={disabledInput}
-                    />
-                  </div>
+          {/* Water Section */}
+          <SectionCard title={t("bill.water")}>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label htmlFor="prevWaterUnit" className={fieldLabel}>{t("bill.prevUnit")}</label>
+                  <input
+                    id="prevWaterUnit"
+                    type="number"
+                    disabled
+                    className={disabledInput}
+                    {...register("prevWaterUnit", { valueAsNumber: true })}
+                  />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.currentUnit")}
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      placeholder={t("bill.unitPlaceholder")}
-                      className={activeInput}
-                      {...register("waterUnit", {
-                        valueAsNumber: true,
-                        onChange: (e) =>
-                          onChangeWaterUnit(Number(e.target.value)),
-                      })}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.currentUse")}
-                    </label>
-                    <input
-                      type="number"
-                      placeholder={t("bill.unitPlaceholder")}
-                      readOnly
-                      className={calculatedInput}
-                      value={Math.max(0, (watch("waterUnit") || 0) - prevWaterUnit)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.currentAmount")}
-                    </label>
-                    <input
-                      type="number"
-                      placeholder={t("bill.amountPlaceholder")}
-                      readOnly
-                      className={calculatedInput}
-                      {...register("waterUsage", { valueAsNumber: true })}
-                    />
-                    {/* <p className="mt-1.5 text-xs text-zinc-500">
-                      {t("bill.perUnitRate", { rate: waterRateUnit })}
-                    </p> */}
-                  </div>
+                <div>
+                  <label htmlFor="prevWaterUsage" className={fieldLabel}>{t("bill.prevUse")}</label>
+                  <input
+                    id="prevWaterUsage"
+                    type="number"
+                    disabled
+                    className={disabledInput}
+                    {...register("prevWaterUsage", { valueAsNumber: true })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="prevWaterAmount" className={fieldLabel}>{t("bill.prevAmount")}</label>
+                  <input
+                    id="prevWaterAmount"
+                    type="number"
+                    disabled
+                    value={prevWaterUsage * waterRateUnit}
+                    readOnly
+                    className={disabledInput}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label htmlFor="waterUnit" className={fieldLabel}>{t("bill.currentUnit")}</label>
+                  <input
+                    id="waterUnit"
+                    type="number"
+                    step="any"
+                    placeholder={t("bill.unitPlaceholder")}
+                    className={activeInput}
+                    {...register("waterUnit", {
+                      valueAsNumber: true,
+                      onChange: (e) => onChangeWaterUnit(Number(e.target.value)),
+                    })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="waterUnitDiff" className={fieldLabel}>{t("bill.currentUse")}</label>
+                  <input
+                    id="waterUnitDiff"
+                    type="number"
+                    readOnly
+                    className={calculatedInput}
+                    value={Math.max(0, (watch("waterUnit") || 0) - prevWaterUnit)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="waterUsage" className={fieldLabel}>{t("bill.currentAmount")}</label>
+                  <input
+                    id="waterUsage"
+                    type="number"
+                    readOnly
+                    className={calculatedInput}
+                    {...register("waterUsage", { valueAsNumber: true })}
+                  />
                 </div>
               </div>
             </div>
+          </SectionCard>
 
-            {/* Electricity Section */}
-            <div className="flex flex-col items-start">
-              <label className="block text-sm font-medium text-zinc-900 mb-3">
-                {t("bill.electricity")}
-              </label>
-              <div className="w-full space-y-3">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.prevUnit")}
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      className={disabledInput}
-                      {...register("prevElectricityUnit", {
-                        valueAsNumber: true,
-                      })}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.prevUse")}
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      className={disabledInput}
-                      {...register("prevElectricityUsage", {
-                        valueAsNumber: true,
-                      })}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.prevAmount")}
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      value={prevElectricityUsage * electricityRateUnit}
-                      readOnly
-                      className={disabledInput}
-                    />
-                  </div>
+          {/* Electricity Section */}
+          <SectionCard title={t("bill.electricity")}>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label htmlFor="prevElectricityUnit" className={fieldLabel}>{t("bill.prevUnit")}</label>
+                  <input
+                    id="prevElectricityUnit"
+                    type="number"
+                    disabled
+                    className={disabledInput}
+                    {...register("prevElectricityUnit", { valueAsNumber: true })}
+                  />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.currentUnit")}
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      placeholder={t("bill.unitPlaceholder")}
-                      className={activeInput}
-                      {...register("electricityUnit", {
-                        valueAsNumber: true,
-                        onChange: (e) =>
-                          onChangeElectricityUnit(Number(e.target.value)),
-                      })}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.currentUse")}
-                    </label>
-                    <input
-                      type="number"
-                      placeholder={t("bill.unitPlaceholder")}
-                      readOnly
-                      className={calculatedInput}
-                      value={Math.max(0, (watch("electricityUnit") || 0) - prevElectricityUnit)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <label className="block text-xs font-medium text-zinc-600 mb-2">
-                      {t("bill.currentAmount")}
-                    </label>
-                    <input
-                      type="number"
-                      placeholder={t("bill.amountPlaceholder")}
-                      readOnly
-                      className={calculatedInput}
-                      {...register("electricityUsage", { valueAsNumber: true })}
-                    />
-                    <p className="mt-1.5 text-xs text-zinc-500">
-                      {t("bill.perUnitRate", { rate: electricityRateUnit })}
-                    </p>
-                  </div>
+                <div>
+                  <label htmlFor="prevElectricityUsage" className={fieldLabel}>{t("bill.prevUse")}</label>
+                  <input
+                    id="prevElectricityUsage"
+                    type="number"
+                    disabled
+                    className={disabledInput}
+                    {...register("prevElectricityUsage", { valueAsNumber: true })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="prevElectricityAmount" className={fieldLabel}>{t("bill.prevAmount")}</label>
+                  <input
+                    id="prevElectricityAmount"
+                    type="number"
+                    disabled
+                    value={prevElectricityUsage * electricityRateUnit}
+                    readOnly
+                    className={disabledInput}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label htmlFor="electricityUnit" className={fieldLabel}>{t("bill.currentUnit")}</label>
+                  <input
+                    id="electricityUnit"
+                    type="number"
+                    step="any"
+                    placeholder={t("bill.unitPlaceholder")}
+                    className={activeInput}
+                    {...register("electricityUnit", {
+                      valueAsNumber: true,
+                      onChange: (e) => onChangeElectricityUnit(Number(e.target.value)),
+                    })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="electricityUnitDiff" className={fieldLabel}>{t("bill.currentUse")}</label>
+                  <input
+                    id="electricityUnitDiff"
+                    type="number"
+                    readOnly
+                    className={calculatedInput}
+                    value={Math.max(0, (watch("electricityUnit") || 0) - prevElectricityUnit)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="electricityUsage" className={fieldLabel}>{t("bill.currentAmount")}</label>
+                  <input
+                    id="electricityUsage"
+                    type="number"
+                    readOnly
+                    className={calculatedInput}
+                    {...register("electricityUsage", { valueAsNumber: true })}
+                  />
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    {t("bill.perUnitRate", { rate: electricityRateUnit })}
+                  </p>
                 </div>
               </div>
             </div>
+          </SectionCard>
 
-            {/* Internet */}
-            <div className="flex flex-col items-start">
-              <label
-                htmlFor="internet"
-                className="block text-sm font-medium text-zinc-900 mb-2"
-              >
-                {t("bill.internet")}
-              </label>
-              <input
-                id="internet"
-                type="number"
-                step="any"
-                placeholder={t("bill.enterAmount")}
-                className={activeInput}
-                {...register("internet", { valueAsNumber: true })}
-              />
+          {/* Internet & Rent */}
+          <SectionCard title={t("bill.internet")}>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="internet" className={fieldLabel}>
+                  {t("bill.internet")}
+                </label>
+                <input
+                  id="internet"
+                  type="number"
+                  step="any"
+                  placeholder={t("bill.enterAmount")}
+                  className={activeInput}
+                  {...register("internet", { valueAsNumber: true })}
+                />
+              </div>
+              <div>
+                <label htmlFor="rent" className={fieldLabel}>
+                  {t("bill.rent")}
+                </label>
+                <input
+                  id="rent"
+                  type="number"
+                  step="any"
+                  placeholder={t("bill.enterAmount")}
+                  className={activeInput}
+                  {...register("rent", { valueAsNumber: true })}
+                />
+              </div>
             </div>
+          </SectionCard>
 
-            {/* Rent */}
-            <div className="flex flex-col items-start">
-              <label
-                htmlFor="rent"
-                className="block text-sm font-medium text-zinc-900 mb-2"
-              >
-                {t("bill.rent")}
-              </label>
-              <input
-                id="rent"
-                type="number"
-                step="any"
-                placeholder={t("bill.enterAmount")}
-                className={activeInput}
-                {...register("rent", { valueAsNumber: true })}
-              />
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-zinc-900 text-white font-medium text-sm rounded-xl hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-              >
-                {t("bill.generateBill")}
-              </button>
-            </div>
-          </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full py-4 btn-primary text-white font-semibold text-base rounded-2xl shadow-lg shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer"
+          >
+            {t("bill.generateBill")}
+          </button>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-6 text-zinc-400 text-xs tracking-wider font-mono">
+        <div className="text-center mt-6 text-white/20 text-xs tracking-widest font-mono">
           COPYRIGHT © 2026 - PROUD CH
         </div>
       </div>

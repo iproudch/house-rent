@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "House Rent"
+    "appName": "Chairak"
   },
   "login": {
     "signInTitle": "เข้าสู่ระบบบัญชีของคุณ",
@@ -17,8 +17,30 @@
     "hasAccount": "มีบัญชีอยู่แล้ว?"
   },
   "nav": {
-    "generateBill": "สร้างใบแจ้งหนี้",
+    "generateBill": "สร้างบิล",
+    "manage": "จัดการบิล",
     "logout": "ออกจากระบบ"
+  },
+  "manage": {
+    "title": "จัดการบิล",
+    "totalBills": "จำนวนบิลทั้งหมด",
+    "totalAmount": "ยอดรวมทั้งหมด",
+    "avgMonthly": "เฉลี่ยต่อเดือน",
+    "records": "รายการ",
+    "allTime": "ตลอดระยะเวลา",
+    "elecUnit": "มิเตอร์ไฟ",
+    "waterUnit": "มิเตอร์น้ำ",
+    "elecUsage": "ยูนิตไฟ",
+    "waterUsage": "ยูนิตน้ำ",
+    "total": "รวม",
+    "action": "จัดการ",
+    "edit": "แก้ไข",
+    "editTitle": "แก้ไขบิล",
+    "save": "บันทึก",
+    "saving": "กำลังบันทึก...",
+    "cancel": "ยกเลิก",
+    "noData": "ไม่มีข้อมูลบิล",
+    "selectHousePrompt": "กรุณาเลือกบ้านเพื่อดูข้อมูลบิล"
   },
   "bill": {
     "title": "จัดการบิล",
@@ -39,6 +61,7 @@
     "amountPlaceholder": "จำนวนเงิน",
     "enterAmount": "กรอกจำนวนเงิน",
     "perUnitRate": "{{rate}}฿ ต่อหน่วย",
-    "generateBill": "สร้างบิล"
+    "generateBill": "สร้างบิล",
+    "existingBillWarning": "มีใบแจ้งหนี้สำหรับเดือน{{month}}แล้ว กดสร้างบิลเพื่อออกใบแจ้งหนี้อีกครั้ง"
   }
 }

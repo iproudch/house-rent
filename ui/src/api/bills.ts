@@ -27,7 +27,39 @@ const mapBill = (d: any): IBill => ({
   waterUsage: d.water_usage,
   rent: d.rent,
   internet: d.internet,
+  total: d.total,
+  createdAt: d.created_at,
 });
+
+export const getBillsByHouse = async (houseId: string): Promise<IBill[]> => {
+  const res = await axios.get(`${API_URL}/api/bills`, { params: { houseId } });
+  return res.data.map(mapBill);
+};
+
+export type UpdateBillPayload = {
+  billingMonth?: string;
+  electricityUnit?: number;
+  waterUnit?: number;
+  electricityUsage?: number;
+  waterUsage?: number;
+  rent?: number;
+  internet?: number;
+  total?: number;
+};
+
+export const updateBill = async (id: string, payload: UpdateBillPayload): Promise<IBill> => {
+  const res = await axios.patch(`${API_URL}/api/bills/${id}`, {
+    billing_month: payload.billingMonth,
+    electricity_unit: payload.electricityUnit,
+    water_unit: payload.waterUnit,
+    electricity_usage: payload.electricityUsage,
+    water_usage: payload.waterUsage,
+    rent: payload.rent,
+    internet: payload.internet,
+    total: payload.total,
+  });
+  return mapBill(res.data);
+};
 
 export const getCurrentBill = async (params: {
   houseId: string;

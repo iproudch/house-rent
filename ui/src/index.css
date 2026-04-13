@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+@layer base {
+  body {
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .btn-primary {
+    background: linear-gradient(135deg, #4f6bed 0%, #6b8bf5 100%);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #3d5ce8 0%, #5a7cf2 100%);
+  }
+  .card-shadow {
+    box-shadow: 0 8px 32px rgba(13, 27, 75, 0.18), 0 2px 8px rgba(79, 107, 237, 0.08);
+  }
+  .nav-blur {
+    backdrop-filter: blur(12px);
+    background: rgba(13, 27, 75, 0.75);
+  }
+}

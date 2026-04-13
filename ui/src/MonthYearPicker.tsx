@@ -52,55 +52,47 @@ export default function MonthYearPicker(
       <div className="relative">
         <button
           type="button"
-          className={`w-full px-4 py-4 bg-white border-2 rounded-2xl flex items-center justify-between cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md ${
-            isOpen ? "border-blue-100 shadow-md" : "border-stone-200"
+          className={`w-full px-4 py-2.5 bg-white border rounded-xl flex items-center justify-between cursor-pointer transition-all duration-200 text-sm ${
+            isOpen ? "border-indigo-400 ring-4 ring-indigo-400/10" : "border-slate-200 hover:border-slate-300"
           }`}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <span className="text-n font-normal text-slate-900">
-            {formatDisplay()}
-          </span>
+          <span className="font-normal text-slate-900">{formatDisplay()}</span>
           <Calendar
-            size={24}
-            className={`text-blue-500 transition-transform duration-300 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            size={18}
+            className={`text-indigo-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           />
         </button>
 
         {isOpen && (
-          <div className="absolute top-[calc(100%+12px)] left-0 right-0 bg-white border-2 border-stone-200 rounded-2xl p-6 shadow-xl z-50">
-            <div className="flex items-center justify-between mb-3 pb-2.5 ">
+          <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white border border-slate-200 rounded-2xl p-5 shadow-xl z-50">
+            <div className="flex items-center justify-between mb-4">
               <button
                 type="button"
-                className="w-9 h-9 rounded-lg bg-blue-100 text-slate-900 hover:bg-blue-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
+                className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all duration-200 active:scale-95"
                 onClick={() => setViewYear((prev) => prev - 1)}
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={16} />
               </button>
-
-              <div className="text-xl font-semibold text-slate-900">
-                {viewYear}
-              </div>
-
+              <span className="text-sm font-semibold text-slate-800">{viewYear}</span>
               <button
                 type="button"
-                className="w-9 h-9 rounded-lg bg-blue-100 text-slate-900 hover:bg-blue-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
+                className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all duration-200 active:scale-95"
                 onClick={() => setViewYear((prev) => prev + 1)}
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={16} />
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-2">
               {MONTHS.map((month, index) => (
                 <button
                   key={month}
                   type="button"
-                  className={`px-2 py-2.5 border-1 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:border-blue-300 hover:-translate-y-0.5 hover:shadow-sm active:scale-95 ${
+                  className={`py-2 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 active:scale-95 ${
                     selectedMonth === index && selectedYear === viewYear
-                      ? "bg-blue-100 border-blue-200 text-zinc-900 font-medium "
-                      : "bg-white border-stone-200 text-slate-900"
+                      ? "bg-gradient-to-br from-indigo-500 to-blue-500 text-white shadow-md shadow-indigo-200"
+                      : "bg-slate-50 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
                   }`}
                   onClick={() => {
                     handleMonthSelect(index);
