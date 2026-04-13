@@ -3,11 +3,52 @@ import { supabase } from "../supabase";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
+  const { houseId } = req.query as { houseId?: string };
+
+  let query = supabase.from("bills").select("*").order("billing_month", { ascending: false });
+
+  if (houseId) {
+    query = query.eq("house_id", houseId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  return res.json(data);
+});
+
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const {
+    billing_month,
+    electricity_unit,
+    water_unit,
+    electricity_usage,
+    water_usage,
+    rent,
+    internet,
+    total,
+  } = req.body;
+
   const { data, error } = await supabase
     .from("bills")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .update({
+      billing_month,
+      electricity_unit,
+      water_unit,
+      electricity_usage,
+      water_usage,
+      rent,
+      internet,
+      total,
+    })
+    .eq("id", id)
+    .select()
+    .single();
 
   if (error) {
     return res.status(400).json({ error: error.message });
