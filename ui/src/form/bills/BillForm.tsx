@@ -172,7 +172,7 @@ function BillFormContent() {
                 <label htmlFor="billingMonthPicker" className={fieldLabel}>
                   {t("bill.billingMonth")}
                 </label>
-                <MonthYearPicker setValue={onChangeBillingMonth} onChange={ (v)=>onChangeBillingMonth(v)} />
+                <MonthYearPicker setValue={onChangeBillingMonth} onChange={() => onChangeBillingMonth(watchedBillingMonth)} />
               </div>
             </div>
 
