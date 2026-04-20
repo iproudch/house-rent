@@ -1,11 +1,26 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Pencil, Printer } from "lucide-react";
 import type { IBill } from "../@types/bill";
+import type { IReceiptData } from "./interface/recipe";
 import type { UpdateBillPayload } from "./api/bills";
 import { useBillsByHouse } from "./hooks/useBillsByHouse";
 import { useHouses } from "./hooks/useHouses";
 import { useUpdateBill } from "./hooks/useUpdateBill";
-import { MONTHS_TH_SHORT } from "./constants/month";
+import { MONTHS_TH, MONTHS_TH_SHORT } from "./constants/month";
+import { generateBillPDF } from "./utils/pdf";
+
+const calculateWaterBill = (units: number): number => {
+  let sum = 0;
+  for (let i = 1; i <= units; i++) {
+    if (i <= 10) sum += 10.2;
+    else if (i <= 20) sum += 16.0;
+    else if (i <= 30) sum += 19.0;
+    else if (i <= 50) sum += 21.2;
+    else sum += 99999;
+  }
+  return sum;
+};
 
 const formatBillingMonth = (iso: string) => {
   if (!iso) return "-";
@@ -65,6 +80,48 @@ export default function ManagePage() {
     (max, b) => (max == null || (b.total ?? 0) > (max.total ?? 0) ? b : max),
     null,
   );
+
+  const handlePrint = (bill: IBill) => {
+    const house = houses?.find((h) => h.id === selectedHouseId);
+    if (!house) return;
+
+    const [year, month] = bill.billingMonth.split("-");
+    const monthName = MONTHS_TH[parseInt(month, 10) - 1];
+
+    const waterUnits = bill.waterUsage ?? 0;
+    const waterAmount = calculateWaterBill(waterUnits);
+    const elecUnits = bill.electricityUsage ?? 0;
+    const elecRate = house.electricity_unit_base ?? 0;
+
+    const receiptData: IReceiptData = {
+      houseNumber: house.name,
+      month: `${monthName} ${year}`,
+      year,
+      items: [
+        {
+          name: "ค่าน้ำ",
+          previous: (bill.waterUnit ?? 0) - waterUnits,
+          current: bill.waterUnit ?? 0,
+          units: waterUnits,
+          price: house.water_unit_base ?? 0,
+          amount: waterAmount,
+        },
+        {
+          name: "ค่าไฟ",
+          previous: (bill.electricityUnit ?? 0) - elecUnits,
+          current: bill.electricityUnit ?? 0,
+          units: elecUnits,
+          price: elecRate,
+          amount: elecUnits * elecRate,
+        },
+      ],
+      internet: bill.internet ?? 0,
+      houseRent: bill.rent ?? 0,
+      total: bill.total ?? 0,
+    };
+
+    generateBillPDF(receiptData);
+  };
 
   const openEdit = (bill: IBill) => {
     setEditingBill(bill);
@@ -224,13 +281,24 @@ export default function ManagePage() {
                             ฿{formatCurrency(bill.total)}
                           </td>
                           <td className="px-4 py-3 text-center whitespace-nowrap">
-                            <button
-                              type="button"
-                              onClick={() => openEdit(bill)}
-                              className="px-3 py-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
-                            >
-                              {t("manage.edit")}
-                            </button>
+                            <div className="flex items-center justify-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => openEdit(bill)}
+                                title={t("manage.edit")}
+                                className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                              >
+                                <Pencil size={15} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handlePrint(bill)}
+                                title={t("manage.print")}
+                                className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                              >
+                                <Printer size={15} />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
