@@ -83,7 +83,7 @@ function BillFormContent() {
 
   const onChangeElectricityUnit = (current: number) => {
     const useUnit = current - prevElectricityUnit;
-    setValue("electricityUsage", useUnit * electricityRateUnit);
+    setValue("electricityUsage", parseFloat((useUnit * electricityRateUnit).toFixed(2)));
   };
 
   const { data: prevBill } = usePreviousBill({
