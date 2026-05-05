@@ -6,7 +6,27 @@ import { useHouses } from "../../hooks/useHouses";
 import { usePreviousBill } from "../../hooks/usePreviousBill";
 import MonthYearPicker from "../../MonthYearPicker";
 import { toBillingMonth } from "../../utils/billing-month";
-import BillFormProvider, { useBillFormContext, type IBillForm } from "./BillFormProvider";
+import { roundToMaxTwoDecimals } from "../../utils/number";
+import { calculateWaterBill } from "../../utils/water";
+import { useBillFormContext } from "./BillFormContext";
+import BillFormProvider, { type IBillForm } from "./BillFormProvider";
+
+type NumericBillField = Exclude<keyof IBillForm, "houseId" | "billingMonth">;
+
+const resetHouseBillFields: NumericBillField[] = [
+  "prevWaterUnit",
+  "prevWaterUsage",
+  "waterUnit",
+  "waterUsage",
+  "waterRateUnit",
+  "prevElectricityUnit",
+  "prevElectricityUsage",
+  "electricityUnit",
+  "electricityUsage",
+  "electricityRateUnit",
+  "internet",
+  "rent",
+];
 
 export default function BillForm(): ReactElement {
   const formRef = useRef<HTMLFormElement>(null);
@@ -50,16 +70,41 @@ function BillFormContent() {
     [houseId, houseUsers],
   );
 
-  const waterRateUnit = selectedHouse?.water_unit_base || 0;
   const electricityRateUnit = selectedHouse?.electricity_unit_base || 0;
 
+  const normalizeNumberField = (field: NumericBillField, value: string) => {
+    setValue(field, roundToMaxTwoDecimals(Number(value)), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const normalizeWaterUnit = (value: string) => {
+    const roundedValue = roundToMaxTwoDecimals(Number(value));
+    setValue("waterUnit", roundedValue, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    onChangeWaterUnit(roundedValue);
+  };
+
+  const normalizeElectricityUnit = (value: string) => {
+    const roundedValue = roundToMaxTwoDecimals(Number(value));
+    setValue("electricityUnit", roundedValue, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    onChangeElectricityUnit(roundedValue);
+  };
+
   const onSelectHouseUser = (id: string) => {
+    resetHouseBillFields.forEach((field) => setValue(field, 0));
     const user = houseUsers?.find((house) => house.id === id);
     if (!user) return;
-    setValue("rent", user.rent_base);
-    setValue("internet", user.internet_base || 0);
-    setValue("waterRateUnit", user.water_unit_base || 0);
-    setValue("electricityRateUnit", user.electricity_unit_base || 0);
+    setValue("rent", roundToMaxTwoDecimals(user.rent_base));
+    setValue("internet", roundToMaxTwoDecimals(user.internet_base || 0));
+    setValue("waterRateUnit", roundToMaxTwoDecimals(user.water_unit_base || 0));
+    setValue("electricityRateUnit", roundToMaxTwoDecimals(user.electricity_unit_base || 0));
   };
 
   const onChangeBillingMonth = useCallback((value: string) => {
@@ -69,21 +114,13 @@ function BillFormContent() {
   },[setValue]);
 
   const onChangeWaterUnit = (current: number) => {
-    const useUnit = current - prevWaterUnit;
-    let sum = 0;
-    for (let i = 1; i <= useUnit; i++) {
-      if (i <= 10) sum += 10.20;
-      else if (i <= 20) sum += 16.00;
-      else if (i <= 30) sum += 19.00;
-      else if (i <= 50) sum += 21.20;
-      else sum += 99999;
-    }
-    setValue("waterUsage", parseFloat(sum.toFixed(2)));
+    const useUnit = roundToMaxTwoDecimals(current - prevWaterUnit);
+    setValue("waterUsage", calculateWaterBill(useUnit));
   };
 
   const onChangeElectricityUnit = (current: number) => {
     const useUnit = current - prevElectricityUnit;
-    setValue("electricityUsage", parseFloat((useUnit * electricityRateUnit).toFixed(2)));
+    setValue("electricityUsage", roundToMaxTwoDecimals(useUnit * electricityRateUnit));
   };
 
   const { data: prevBill } = usePreviousBill({
@@ -99,10 +136,10 @@ function BillFormContent() {
       setValue("prevElectricityUsage", 0);
       return;
     }
-    setValue("prevWaterUnit", prevBill.waterUnit || 0);
-    setValue("prevWaterUsage", prevBill.waterUsage || 0);
-    setValue("prevElectricityUnit", prevBill.electricityUnit || 0);
-    setValue("prevElectricityUsage", prevBill.electricityUsage || 0);
+    setValue("prevWaterUnit", roundToMaxTwoDecimals(prevBill.waterUnit || 0));
+    setValue("prevWaterUsage", roundToMaxTwoDecimals(prevBill.waterUsage || 0));
+    setValue("prevElectricityUnit", roundToMaxTwoDecimals(prevBill.electricityUnit || 0));
+    setValue("prevElectricityUsage", roundToMaxTwoDecimals(prevBill.electricityUsage || 0));
   }, [prevBill, setValue]);
 
   const populatedBillIdRef = useRef<string | null>(null);
@@ -114,13 +151,13 @@ function BillFormContent() {
     }
     if (populatedBillIdRef.current === currentBill.id) return;
     populatedBillIdRef.current = currentBill.id;
-    setValue("waterUnit", currentBill.waterUnit || 0);
-    setValue("waterUsage", (currentBill.waterUsage || 0) * waterRateUnit);
-    setValue("electricityUnit", currentBill.electricityUnit || 0);
-    setValue("electricityUsage", (currentBill.electricityUsage || 0) * electricityRateUnit);
-    setValue("rent", currentBill.rent || 0);
-    setValue("internet", currentBill.internet || 0);
-  }, [currentBill, waterRateUnit, electricityRateUnit, setValue]);
+    setValue("waterUnit", roundToMaxTwoDecimals(currentBill.waterUnit || 0));
+    setValue("waterUsage", calculateWaterBill(currentBill.waterUsage || 0));
+    setValue("electricityUnit", roundToMaxTwoDecimals(currentBill.electricityUnit || 0));
+    setValue("electricityUsage", roundToMaxTwoDecimals((currentBill.electricityUsage || 0) * electricityRateUnit));
+    setValue("rent", roundToMaxTwoDecimals(currentBill.rent || 0));
+    setValue("internet", roundToMaxTwoDecimals(currentBill.internet || 0));
+  }, [currentBill, electricityRateUnit, setValue]);
 
   const warningMonthName = useMemo(() => {
     if (!watchedBillingMonth) return "";
@@ -216,7 +253,7 @@ function BillFormContent() {
                     id="prevWaterAmount"
                     type="number"
                     disabled
-                    value={prevWaterUsage * waterRateUnit}
+                    value={calculateWaterBill(prevWaterUsage)}
                     readOnly
                     className={disabledInput}
                   />
@@ -234,6 +271,7 @@ function BillFormContent() {
                     {...register("waterUnit", {
                       valueAsNumber: true,
                       onChange: (e) => onChangeWaterUnit(Number(e.target.value)),
+                      onBlur: (e) => normalizeWaterUnit(e.target.value),
                     })}
                   />
                 </div>
@@ -244,7 +282,7 @@ function BillFormContent() {
                     type="number"
                     readOnly
                     className={calculatedInput}
-                    value={Math.max(0, (watch("waterUnit") || 0) - prevWaterUnit)}
+                    value={roundToMaxTwoDecimals(Math.max(0, (watch("waterUnit") || 0) - prevWaterUnit))}
                   />
                 </div>
                 <div>
@@ -291,7 +329,7 @@ function BillFormContent() {
                     id="prevElectricityAmount"
                     type="number"
                     disabled
-                    value={prevElectricityUsage * electricityRateUnit}
+                    value={roundToMaxTwoDecimals(prevElectricityUsage * electricityRateUnit)}
                     readOnly
                     className={disabledInput}
                   />
@@ -309,6 +347,7 @@ function BillFormContent() {
                     {...register("electricityUnit", {
                       valueAsNumber: true,
                       onChange: (e) => onChangeElectricityUnit(Number(e.target.value)),
+                      onBlur: (e) => normalizeElectricityUnit(e.target.value),
                     })}
                   />
                 </div>
@@ -319,7 +358,7 @@ function BillFormContent() {
                     type="number"
                     readOnly
                     className={calculatedInput}
-                    value={Math.max(0, (watch("electricityUnit") || 0) - prevElectricityUnit)}
+                    value={roundToMaxTwoDecimals(Math.max(0, (watch("electricityUnit") || 0) - prevElectricityUnit))}
                   />
                 </div>
                 <div>
@@ -352,7 +391,10 @@ function BillFormContent() {
                   step="any"
                   placeholder={t("bill.enterAmount")}
                   className={activeInput}
-                  {...register("internet", { valueAsNumber: true })}
+                  {...register("internet", {
+                    valueAsNumber: true,
+                    onBlur: (e) => normalizeNumberField("internet", e.target.value),
+                  })}
                 />
               </div>
               <div>
@@ -365,7 +407,10 @@ function BillFormContent() {
                   step="any"
                   placeholder={t("bill.enterAmount")}
                   className={activeInput}
-                  {...register("rent", { valueAsNumber: true })}
+                  {...register("rent", {
+                    valueAsNumber: true,
+                    onBlur: (e) => normalizeNumberField("rent", e.target.value),
+                  })}
                 />
               </div>
             </div>

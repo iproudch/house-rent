@@ -84,6 +84,8 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
 
   // === TABLE ROWS ===
   receiptData.items.forEach((item, index) => {
+    const rate  = item.name === "ค่าน้ำ" ? "-" : item.price.toString();
+
     if (index % 2 === 0) {
       doc.setFillColor(PR, PG, PB);
       doc.rect(margin, yPos, pageWidth - 2 * margin, 10, "F");
@@ -98,7 +100,7 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
     xPos += colWidths.current;
     doc.text(convertToString(item.units), xPos, yPos + 7);
     xPos += colWidths.units;
-    doc.text(item.price.toString(), xPos, yPos + 7);
+    doc.text(rate, xPos, yPos + 7);
     xPos += colWidths.price;
     doc.text(item.amount.toString(), pageWidth - margin - 2, yPos + 7, { align: "right" });
 
@@ -148,6 +150,7 @@ export const generateBillPDF = (receiptData: IReceiptData) => {
     "             11-20 หน่วย 16บาท/หน่วย",
     "             21-30 หน่วย 19บาท/หน่วย",
     "             31-50 หน่วย 21.20บาท/หน่วย",
+    "             หมายเหตุ อัตราค่าน้ำที่ระบุในบิลเป็นอัตราที่รวมภาษีมูลค่าเพิ่ม  7% แล้ว",
     "         4. จ่ายค่าเช่าไม่เกินวันที่ 1-5 หลังจากนั้นปรับวันละ 200 บาท",
   ];
 

@@ -9,18 +9,7 @@ import { useHouses } from "./hooks/useHouses";
 import { useUpdateBill } from "./hooks/useUpdateBill";
 import { MONTHS_TH, MONTHS_TH_SHORT } from "./constants/month";
 import { generateBillPDF } from "./utils/pdf";
-
-const calculateWaterBill = (units: number): number => {
-  let sum = 0;
-  for (let i = 1; i <= units; i++) {
-    if (i <= 10) sum += 10.2;
-    else if (i <= 20) sum += 16.0;
-    else if (i <= 30) sum += 19.0;
-    else if (i <= 50) sum += 21.2;
-    else sum += 99999;
-  }
-  return sum;
-};
+import { calculateWaterBill } from "./utils/water";
 
 const formatBillingMonth = (iso: string) => {
   if (!iso) return "-";

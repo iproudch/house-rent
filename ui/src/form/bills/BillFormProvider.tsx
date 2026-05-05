@@ -1,8 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   type ReactElement,
@@ -22,17 +20,8 @@ import { generateBillPDF } from "../../utils/pdf";
 import { useHouses } from "../../hooks/useHouses";
 import { useAddBill } from "../../hooks/useAddBill";
 import { useCurrentBill } from "../../hooks/useCurrentBill";
-import type { IBill } from "../../../@types/bill";
-
-type BillFormContextValue = {
-  currentBill: IBill | null | undefined;
-};
-
-const BillFormContext = createContext<BillFormContextValue>({
-  currentBill: undefined,
-});
-
-export const useBillFormContext = () => useContext(BillFormContext);
+import { roundToMaxTwoDecimals } from "../../utils/number";
+import { BillFormContext } from "./BillFormContext";
 
 type BillFormProviderProps = {
   children: React.ReactNode | React.ReactNode[];
@@ -107,19 +96,37 @@ export default function BillFormProvider(
       waterRateUnit,
       electricityRateUnit,
     } = data;
+    const roundedPrevWaterUnit = roundToMaxTwoDecimals(prevWaterUnit);
+    const roundedWaterUnit = roundToMaxTwoDecimals(waterUnit);
+    const roundedWaterUsage = roundToMaxTwoDecimals(waterUsage);
+    const roundedPrevElectricityUnit = roundToMaxTwoDecimals(prevElectricityUnit);
+    const roundedElectricityUnit = roundToMaxTwoDecimals(electricityUnit);
+    const roundedElectricityUsage = roundToMaxTwoDecimals(electricityUsage);
+    const roundedInternet = roundToMaxTwoDecimals(internet);
+    const roundedRent = roundToMaxTwoDecimals(rent);
+    const roundedWaterRateUnit = roundToMaxTwoDecimals(waterRateUnit);
+    const roundedElectricityRateUnit = roundToMaxTwoDecimals(electricityRateUnit);
+    const roundedWaterUsageUnits = roundToMaxTwoDecimals(roundedWaterUnit - roundedPrevWaterUnit);
+    const roundedElectricityUsageUnits = roundToMaxTwoDecimals(
+      roundedElectricityUnit - roundedPrevElectricityUnit,
+    );
+    const roundedTotal = roundToMaxTwoDecimals(
+      roundedWaterUsage + roundedElectricityUsage + roundedInternet + roundedRent,
+    );
     try {
+      console.log("submit bill form data:", data);
       if (!currentBill) {
         await mutateAsync({
           houseId,
           billingMonth,
-          water: waterUsage,
-          electricity: electricityUsage,
-          waterUnit,
-          electricityUnit,
-          waterUsageUnits: waterUnit - prevWaterUnit,
-          electricityUsageUnits: electricityUnit - prevElectricityUnit,
-          internet,
-          rent,
+          water: roundedWaterUsage,
+          electricity: roundedElectricityUsage,
+          waterUnit: roundedWaterUnit,
+          electricityUnit: roundedElectricityUnit,
+          waterUsageUnits: roundedWaterUsageUnits,
+          electricityUsageUnits: roundedElectricityUsageUnits,
+          internet: roundedInternet,
+          rent: roundedRent,
         });
       }
 
@@ -134,24 +141,24 @@ export default function BillFormProvider(
         items: [
           {
             name: "ค่าน้ำ",
-            previous: prevWaterUnit,
-            current: waterUnit,
-            units: waterUnit - prevWaterUnit,
-            price: waterRateUnit,
-            amount: waterUsage,
+            previous: roundedPrevWaterUnit,
+            current: roundedWaterUnit,
+            units: roundedWaterUsageUnits,
+            price: roundedWaterRateUnit,
+            amount: roundedWaterUsage,
           },
           {
             name: "ค่าไฟ",
-            previous: prevElectricityUnit,
-            current: electricityUnit,
-            units: electricityUnit - prevElectricityUnit,
-            price: electricityRateUnit,
-            amount: electricityUsage,
+            previous: roundedPrevElectricityUnit,
+            current: roundedElectricityUnit,
+            units: roundedElectricityUsageUnits,
+            price: roundedElectricityRateUnit,
+            amount: roundedElectricityUsage,
           },
         ],
-        internet: internet,
-        houseRent: rent,
-        total: waterUsage + electricityUsage + internet + rent,
+        internet: roundedInternet,
+        houseRent: roundedRent,
+        total: roundedTotal,
       };
       generateBillPDF(billData);
     } catch (e) {
