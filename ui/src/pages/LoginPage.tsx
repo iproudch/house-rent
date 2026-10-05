@@ -9,7 +9,8 @@ enum EMode {
 export default function LoginPage() {
   const { signIn, signUp } = useAuth();
   const { t } = useTranslation();
-  const [mode, setMode] = useState<EMode>(EMode.SIGN_IN);
+  // const [mode, setMode] = useState<EMode>(EMode.SIGN_IN);
+  const mode = EMode.SIGN_IN
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
