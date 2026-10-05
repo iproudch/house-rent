@@ -1,8 +1,8 @@
 interface IReceiptItem {
   name: string;
   previous: number;
-  current: number;
-  units: number;
+  current: number | "";
+  units: number | "";
   price: number;
   amount: number;
   waterRateUnit?: number

@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useState,
   type ReactElement,
 } from "react";
 import {
@@ -21,7 +22,7 @@ import { useHouses } from "../../hooks/useHouses";
 import { useAddBill } from "../../hooks/useAddBill";
 import { useCurrentBill } from "../../hooks/useCurrentBill";
 import { roundToMaxTwoDecimals } from "../../utils/number";
-import { BillFormContext } from "./BillFormContext";
+import { BillFormContext, PdfStatus } from "./BillFormContext";
 
 type BillFormProviderProps = {
   children: React.ReactNode | React.ReactNode[];
@@ -68,6 +69,7 @@ export default function BillFormProvider(
   });
 
   const { reset, handleSubmit, control } = formMethods;
+  const [pdfStatus, setPdfStatus] = useState<PdfStatus>(PdfStatus.Idle);
 
   const watchedHouseId = useWatch({ control, name: "houseId" });
   const watchedBillingMonth = useWatch({ control, name: "billingMonth" });
@@ -76,6 +78,8 @@ export default function BillFormProvider(
     houseId: watchedHouseId || undefined,
     billingMonth: watchedBillingMonth || undefined,
   });
+
+  const clearPdfStatus = useCallback(() => setPdfStatus(PdfStatus.Idle), []);
 
   const onReset = useCallback(() => {
     reset(defaultValues);
@@ -160,8 +164,11 @@ export default function BillFormProvider(
         houseRent: roundedRent,
         total: roundedTotal,
       };
+      setPdfStatus(PdfStatus.Loading);
       generateBillPDF(billData);
+      setPdfStatus(PdfStatus.Success);
     } catch (e) {
+      setPdfStatus(PdfStatus.Error);
       console.error("submit bill form error:", e);
     }
   };
@@ -175,7 +182,7 @@ export default function BillFormProvider(
   }, [defaultValues, reset]);
 
   return (
-    <BillFormContext.Provider value={{ currentBill }}>
+    <BillFormContext.Provider value={{ currentBill, pdfStatus, clearPdfStatus }}>
       <FormProvider {...formMethods}>
         <form
           ref={formRef}
@@ -207,19 +214,26 @@ export interface IBillForm {
   billingMonth: string;
 }
 
+const requiredNumber = (message: string) =>
+  yup
+    .number()
+    .transform((v, o) => (o === "" || Number.isNaN(v) ? undefined : v))
+    .required(message)
+    .typeError(message);
+
 export const BillFormSchema: ObjectSchema<IBillForm> = yup.object().shape({
-  houseId: yup.string().required(),
+  houseId: yup.string().required("validation.houseRequired"),
   prevWaterUnit: yup.number().required(),
   prevWaterUsage: yup.number().required(),
-  waterUnit: yup.number().required(),
+  waterUnit: requiredNumber("validation.currentUnitRequired"),
   waterUsage: yup.number().required(),
-  waterRateUnit: yup.number().required(),
+  waterRateUnit: requiredNumber("validation.invalid"),
   prevElectricityUnit: yup.number().required(),
   prevElectricityUsage: yup.number().required(),
-  electricityUnit: yup.number().required(),
+  electricityUnit: requiredNumber("validation.currentUnitRequired"),
   electricityUsage: yup.number().required(),
-  electricityRateUnit: yup.number().required(),
-  internet: yup.number().required(),
-  rent: yup.number().required(),
+  electricityRateUnit: requiredNumber("validation.invalid"),
+  internet: requiredNumber("validation.internetInvalid"),
+  rent: requiredNumber("validation.rentRequired"),
   billingMonth: yup.string().required(),
 });

@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pencil, Printer } from "lucide-react";
-import type { IBill } from "../@types/bill";
-import type { IReceiptData } from "./interface/recipe";
-import type { UpdateBillPayload } from "./api/bills";
-import { useBillsByHouse } from "./hooks/useBillsByHouse";
-import { useHouses } from "./hooks/useHouses";
-import { useUpdateBill } from "./hooks/useUpdateBill";
-import { MONTHS_TH, MONTHS_TH_SHORT } from "./constants/month";
-import { generateBillPDF } from "./utils/pdf";
-import { calculateWaterBill } from "./utils/water";
+import type { IBill } from "../../@types/bill";
+import type { UpdateBillPayload } from "../api/bills";
+import { MONTHS_TH_SHORT, MONTHS_TH } from "../constants/month";
+import { useBillsByHouse } from "../hooks/useBillsByHouse";
+import { useHouses } from "../hooks/useHouses";
+import { useUpdateBill } from "../hooks/useUpdateBill";
+import type { IReceiptData } from "../interface/recipe";
+import { generateBillPDF } from "../utils/pdf";
+import { calculateWaterBill } from "../utils/water";
+
 
 const formatBillingMonth = (iso: string) => {
   if (!iso) return "-";
@@ -155,25 +156,25 @@ export default function ManagePage() {
   };
 
   const inputCls =
-    "w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/10 transition-all";
+    "w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-primary transition-all";
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-[26px] font-bold text-ink tracking-tight">
             {t("manage.title")}
           </h1>
         </div>
 
         {/* House Selector */}
         <div className="mb-6">
-          <label htmlFor="houseSelect" className="block text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">
+          <label htmlFor="houseSelect" className="block text-xs font-semibold text-muted uppercase tracking-widest mb-2">
             {t("bill.house")}
           </label>
           <select
             id="houseSelect"
-            className="w-64 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/10 transition-all appearance-none cursor-pointer card-shadow"
+            className="w-64 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer card-shadow"
             value={selectedHouseId}
             onChange={(e) => setSelectedHouseId(e.target.value)}
           >
@@ -211,7 +212,7 @@ export default function ManagePage() {
             <div className="bg-white rounded-2xl card-shadow overflow-hidden">
               {isLoading ? (
                 <div className="flex items-center justify-center py-16">
-                  <div className="w-6 h-6 border-2 border-indigo-200 border-t-indigo-500 rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-primary-soft border-t-primary rounded-full animate-spin" />
                 </div>
               ) : !bills || bills.length === 0 ? (
                 <div className="flex items-center justify-center py-16 text-slate-400 text-sm">
@@ -244,7 +245,7 @@ export default function ManagePage() {
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {bills.map((bill) => (
-                        <tr key={bill.id} className="hover:bg-indigo-50/40 transition-colors">
+                        <tr key={bill.id} className="hover:bg-primary-soft/40 transition-colors">
                           <td className="px-4 py-3 pl-5 font-semibold text-slate-800 whitespace-nowrap">
                             {formatBillingMonth(bill.billingMonth)}
                           </td>
@@ -275,7 +276,7 @@ export default function ManagePage() {
                                 type="button"
                                 onClick={() => openEdit(bill)}
                                 title={t("manage.edit")}
-                                className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary-soft rounded-lg transition-colors cursor-pointer"
                               >
                                 <Pencil size={15} />
                               </button>
@@ -300,7 +301,7 @@ export default function ManagePage() {
         )}
 
         {!selectedHouseId && (
-          <div className="flex items-center justify-center py-20 text-white/30 text-sm">
+          <div className="flex items-center justify-center py-20 text-muted text-sm">
             {t("manage.selectHousePrompt")}
           </div>
         )}
@@ -455,7 +456,7 @@ export default function ManagePage() {
                   type="button"
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="px-5 py-2.5 text-sm font-semibold btn-primary text-white rounded-xl disabled:opacity-50 transition-all shadow-md shadow-indigo-500/20 cursor-pointer"
+                  className="px-5 py-2.5 text-sm font-semibold btn-primary text-white rounded-xl disabled:opacity-50 transition-all cursor-pointer"
                 >
                   {isSaving ? t("manage.saving") : t("manage.save")}
                 </button>
@@ -464,7 +465,7 @@ export default function ManagePage() {
           </div>
         )}
 
-        <div className="text-center mt-10 text-white/20 text-xs tracking-widest font-mono">
+        <div className="text-center mt-10 text-muted/60 text-xs tracking-widest font-mono">
           COPYRIGHT © 2026 - PROUD CH
         </div>
       </div>

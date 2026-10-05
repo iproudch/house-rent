@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 
 export default function LoginPage() {
   const { signIn, signUp } = useAuth();
@@ -41,17 +41,17 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo area */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-4">
             <span className="text-white text-2xl font-bold">R</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">{t("common.appName")}</h1>
-          <p className="text-white/50 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-ink tracking-tight">{t("common.appName")}</h1>
+          <p className="text-muted text-sm mt-1">
             {mode === "signin" ? t("login.signInTitle") : t("login.signUpTitle")}
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl p-8 card-shadow">
+        <div className="bg-white rounded-2xl border border-line p-8 card-shadow">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="email" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -63,7 +63,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/10 transition-all"
+                className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm outline-none focus:border-primary transition-all"
                 placeholder={t("login.emailPlaceholder")}
               />
             </div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/10 transition-all"
+                className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm outline-none focus:border-primary transition-all"
                 placeholder={t("login.passwordPlaceholder")}
               />
             </div>
@@ -97,7 +97,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary disabled:opacity-60 text-white font-semibold py-3.5 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-md shadow-indigo-500/25 cursor-pointer mt-1"
+              className="btn-primary disabled:opacity-60 text-white font-semibold py-3.5 rounded-2xl transition-all duration-200 cursor-pointer mt-1"
             >
               {loading
                 ? t("login.loading")
@@ -112,14 +112,14 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={toggleMode}
-              className="text-indigo-500 font-medium hover:text-indigo-600 cursor-pointer"
+              className="text-primary font-medium hover:text-primary cursor-pointer"
             >
               {mode === "signin" ? t("login.signUp") : t("login.signIn")}
             </button>
           </p>
         </div>
 
-        <p className="text-center mt-6 text-white/25 text-xs tracking-widest font-mono">
+        <p className="text-center mt-6 text-muted/60 text-xs tracking-widest font-mono">
           COPYRIGHT © 2026 - PROUD CH
         </p>
       </div>

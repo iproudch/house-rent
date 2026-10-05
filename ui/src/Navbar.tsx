@@ -12,10 +12,10 @@ export default function Navbar() {
     return (
       <Link
         to={to}
-        className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
           active
-            ? "bg-white/15 text-white"
-            : "text-white/60 hover:text-white hover:bg-white/10"
+            ? "bg-white text-ink shadow-[0_1px_2px_oklch(0.2_0_0/0.08)]"
+            : "text-muted hover:text-ink"
         }`}
       >
         {label}
@@ -24,21 +24,25 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="nav-blur border-b border-white/10 px-6 py-3 flex items-center justify-between sticky top-0 z-40">
-      <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center mr-2">
-          <span className="text-white text-xs font-bold">CR</span>
+    <nav className="sticky top-0 z-40 bg-white border-b border-line">
+      <div className="max-w-[920px] mx-auto px-6 py-3.5 flex items-center justify-between gap-6">
+        <div className="flex items-center gap-5">
+          <div className="w-9 h-9 rounded-[10px] bg-primary text-white flex items-center justify-center text-sm font-semibold tracking-wide">
+            CR
+          </div>
+          <div className="flex items-center gap-1 bg-[oklch(0.955_0.005_90)] rounded-[10px] p-[3px]">
+            {navLink("/generate-bill", t("nav.generateBill"))}
+            {navLink("/manage", t("nav.manage"))}
+          </div>
         </div>
-        {navLink("/generate-bill", t("nav.generateBill"))}
-        {navLink("/manage", t("nav.manage"))}
-      </div>
 
-      <button
-        onClick={signOut}
-        className="text-white/50 hover:text-white text-sm transition-colors cursor-pointer px-3 py-1.5 rounded-full hover:bg-white/10"
-      >
-        {t("nav.logout")}
-      </button>
+        <button
+          onClick={signOut}
+          className="text-muted hover:text-ink hover:bg-[oklch(0.96_0.005_90)] text-[13.5px] font-medium transition-colors cursor-pointer px-3 py-2 rounded-lg"
+        >
+          {t("nav.logout")}
+        </button>
+      </div>
     </nav>
   );
 }

@@ -1,10 +1,10 @@
 import "./App.css";
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
 import BillForm from "./form/bills/BillForm";
-import LoginPage from "./LoginPage";
+import LoginPage from "./pages/LoginPage";
 import Navbar from "./Navbar";
 import { useAuth } from "./hooks/useAuth";
-import ManagePage from "./ManagePage";
+import ManagePage from "./pages/ManagePage";
 
 function PrivateLayout() {
   const { session, loading } = useAuth();
@@ -12,7 +12,7 @@ function PrivateLayout() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary-soft border-t-primary rounded-full animate-spin" />
       </div>
     );
   }

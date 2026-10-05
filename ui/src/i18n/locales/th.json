@@ -44,12 +44,14 @@
     "selectHousePrompt": "กรุณาเลือกบ้านเพื่อดูข้อมูลบิล"
   },
   "bill": {
-    "title": "จัดการบิล",
+    "title": "สร้างบิลค่าเช่า",
     "house": "บ้าน",
     "selectHouse": "เลือกบ้าน",
     "billingMonth": "เดือนที่เรียกเก็บ",
     "water": "น้ำ",
+    "waterAbbreviation": "น",
     "electricity": "ไฟฟ้า",
+    "electricAbbreviation": "ฟ",
     "internet": "อินเทอร์เน็ต",
     "rent": "ค่าเช่า",
     "prevUnit": "ค่ามิเตอร์เดือนที่ผ่านมา",
@@ -63,6 +65,25 @@
     "enterAmount": "กรอกจำนวนเงิน",
     "perUnitRate": "{{rate}}฿ ต่อหน่วย",
     "generateBill": "สร้างบิล",
-    "existingBillWarning": "มีใบแจ้งหนี้สำหรับเดือน{{month}}แล้ว กดสร้างบิลเพื่อออกใบแจ้งหนี้อีกครั้ง"
+    "existingBillWarning": "มีใบแจ้งหนี้สำหรับเดือน{{month}}แล้ว กดสร้างบิลเพื่อออกใบแจ้งหนี้อีกครั้ง",
+    "generatingPDF": "กำลังสร้าง PDF...",
+    "pdfSuccess": "สร้าง PDF สำเร็จ",
+    "pdfSuccessDesc": "ดาวน์โหลดไฟล์ PDF เรียบร้อยแล้ว",
+    "pdfError": "สร้าง PDF ไม่สำเร็จ",
+    "pdfErrorDesc": "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+    "close": "ปิด",
+    "retry": "ลองใหม่",
+    "subtitle": "กรอกค่ามิเตอร์ปัจจุบันเพื่อคำนวณยอดชำระประจำเดือนโดยอัตโนมัติ",
+    "internetRent": "อินเทอร์เน็ตและค่าเช่า",
+    "rentAbbreviation": "อ",
+    "rateLabel": "อัตรา {{rate}} บาท/หน่วย"
+  },
+  "validation": {
+    "houseRequired": "กรุณาเลือกบ้าน",
+    "currentUnitRequired": "กรุณากรอกค่ามิเตอร์ปัจจุบัน",
+    "rentRequired": "กรุณากรอกค่าเช่า",
+    "internetInvalid": "กรุณากรอกค่าอินเทอร์เน็ตเป็นตัวเลข",
+    "invalid": "ข้อมูลไม่ถูกต้อง",
+    "summary": "กรุณากรอกข้อมูลให้ครบถ้วน ({{count}} รายการ)"
   }
 }

@@ -53,14 +53,14 @@ export default function MonthYearPicker(
         <button
           type="button"
           className={`w-full px-4 py-2.5 bg-white border rounded-xl flex items-center justify-between cursor-pointer transition-all duration-200 text-sm ${
-            isOpen ? "border-indigo-400 ring-4 ring-indigo-400/10" : "border-slate-200 hover:border-slate-300"
+            isOpen ? "border-primary" : "border-slate-200 hover:border-slate-300"
           }`}
           onClick={() => setIsOpen(!isOpen)}
         >
           <span className="font-normal text-slate-900">{formatDisplay()}</span>
           <Calendar
             size={18}
-            className={`text-indigo-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            className={`text-primary transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           />
         </button>
 
@@ -69,7 +69,7 @@ export default function MonthYearPicker(
             <div className="flex items-center justify-between mb-4">
               <button
                 type="button"
-                className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all duration-200 active:scale-95"
+                className="w-8 h-8 rounded-lg bg-primary-soft text-primary hover:bg-primary-soft flex items-center justify-center transition-all duration-200 active:scale-95"
                 onClick={() => setViewYear((prev) => prev - 1)}
               >
                 <ChevronLeft size={16} />
@@ -77,7 +77,7 @@ export default function MonthYearPicker(
               <span className="text-sm font-semibold text-slate-800">{viewYear}</span>
               <button
                 type="button"
-                className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-all duration-200 active:scale-95"
+                className="w-8 h-8 rounded-lg bg-primary-soft text-primary hover:bg-primary-soft flex items-center justify-center transition-all duration-200 active:scale-95"
                 onClick={() => setViewYear((prev) => prev + 1)}
               >
                 <ChevronRight size={16} />
@@ -91,8 +91,8 @@ export default function MonthYearPicker(
                   type="button"
                   className={`py-2 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 active:scale-95 ${
                     selectedMonth === index && selectedYear === viewYear
-                      ? "bg-gradient-to-br from-indigo-500 to-blue-500 text-white shadow-md shadow-indigo-200"
-                      : "bg-slate-50 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600"
+                      ? "bg-primary text-white"
+                      : "bg-slate-50 text-slate-700 hover:bg-primary-soft hover:text-primary"
                   }`}
                   onClick={() => {
                     handleMonthSelect(index);
