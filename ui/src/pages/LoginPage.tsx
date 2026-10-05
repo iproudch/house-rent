@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
+import { sendContact } from "../api/contact";
 
+enum EMode {
+  SIGN_IN = 'sign_in',
+  SIGN_UP = 'sign_up'
+}
 export default function LoginPage() {
   const { signIn, signUp } = useAuth();
   const { t } = useTranslation();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<EMode>(EMode.SIGN_IN);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,7 +23,7 @@ export default function LoginPage() {
     setMessage("");
     setLoading(true);
 
-    if (mode === "signin") {
+    if (mode === EMode.SIGN_IN) {
       const { error } = await signIn(email, password);
       if (error) setError(error.message);
     } else {
@@ -31,22 +36,23 @@ export default function LoginPage() {
   };
 
   const toggleMode = () => {
-    setMode(mode === "signin" ? "signup" : "signin");
+    setMode(mode === EMode.SIGN_IN ? EMode.SIGN_UP : EMode.SIGN_IN);
     setError("");
     setMessage("");
   };
 
+  const loginMode = mode === EMode.SIGN_IN
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
-        {/* Logo area */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-4">
-            <span className="text-white text-2xl font-bold">R</span>
+            <span className="text-white text-2xl font-bold">CR</span>
           </div>
           <h1 className="text-2xl font-bold text-ink tracking-tight">{t("common.appName")}</h1>
           <p className="text-muted text-sm mt-1">
-            {mode === "signin" ? t("login.signInTitle") : t("login.signUpTitle")}
+            {loginMode ? t("login.signInTitle") : t("login.signUpTitle")}
           </p>
         </div>
 
@@ -101,28 +107,32 @@ export default function LoginPage() {
             >
               {loading
                 ? t("login.loading")
-                : mode === "signin"
+                : loginMode
                   ? t("login.signIn")
                   : t("login.signUp")}
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-400 mt-5">
-            {mode === "signin" ? t("login.noAccount") : t("login.hasAccount")}{" "}
+          {/* <p className="text-center text-sm text-slate-400 mt-5">
+            {loginMode? t("login.noAccount") : t("login.hasAccount")}
             <button
               type="button"
               onClick={toggleMode}
               className="text-primary font-medium hover:text-primary cursor-pointer"
             >
-              {mode === "signin" ? t("login.signUp") : t("login.signIn")}
+              {loginMode ? t("login.signUp") : t("login.signIn")}
             </button>
-          </p>
+          </p> */}
+        <p className="text-center text-sm text-slate-400 mt-5 italic">
+         New customer registration is coming soon.
+        </p>
         </div>
 
         <p className="text-center mt-6 text-muted/60 text-xs tracking-widest font-mono">
           COPYRIGHT © 2026 - PROUD CH
         </p>
       </div>
+
     </div>
   );
 }

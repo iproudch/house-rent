@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Chairak"
+    "appName": "House Bill Management"
   },
   "login": {
     "signInTitle": "เข้าสู่ระบบบัญชีของคุณ",
@@ -14,7 +14,25 @@
     "loading": "...",
     "confirmEmail": "กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีของคุณ",
     "noAccount": "ยังไม่มีบัญชี?",
-    "hasAccount": "มีบัญชีอยู่แล้ว?"
+    "hasAccount": "มีบัญชีอยู่แล้ว?",
+    "noAccountContact": "ยังไม่มีบัญชี?",
+    "contactSupport": "ติดต่อฝ่ายสนับสนุน"
+  },
+  "contact": {
+    "title": "ติดต่อฝ่ายสนับสนุน",
+    "description": "กรอกข้อมูลด้านล่าง เราจะติดต่อกลับทางอีเมลของคุณ",
+    "name": "ชื่อ",
+    "namePlaceholder": "ชื่อของคุณ",
+    "email": "อีเมลของคุณ",
+    "subject": "หัวข้อ",
+    "subjectDefault": "ขอสมัครใช้งานระบบ",
+    "message": "ข้อความ",
+    "messagePlaceholder": "เขียนข้อความของคุณที่นี่",
+    "send": "ส่งข้อความ",
+    "sent": "ส่งข้อความเรียบร้อยแล้ว เราจะติดต่อกลับโดยเร็ว",
+    "error": "ส่งข้อความไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
+    "cancel": "ยกเลิก",
+    "close": "ปิด"
   },
   "nav": {
     "generateBill": "สร้างบิล",
