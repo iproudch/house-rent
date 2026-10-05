@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
-import { sendContact } from "../api/contact";
 
 enum EMode {
   SIGN_IN = 'sign_in',
@@ -35,11 +34,11 @@ export default function LoginPage() {
     setLoading(false);
   };
 
-  const toggleMode = () => {
-    setMode(mode === EMode.SIGN_IN ? EMode.SIGN_UP : EMode.SIGN_IN);
-    setError("");
-    setMessage("");
-  };
+  // const toggleMode = () => {
+  //   setMode(mode === EMode.SIGN_IN ? EMode.SIGN_UP : EMode.SIGN_IN);
+  //   setError("");
+  //   setMessage("");
+  // };
 
   const loginMode = mode === EMode.SIGN_IN
 
